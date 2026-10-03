@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Parent Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #response {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 5px solid #17a2b8;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Parent Registration</h1>
+    
+    <div id="debug">
+        <h2>Testing Mode</h2>
+        <button id="skipVerification">Override Email Verification</button>
+    </div>
+    
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="fullName">Parent's Full Name</label>
+            <input type="text" id="fullName" name="fullName" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <div class="form-group">
+            <label for="childName">Student's Full Name</label>
+            <input type="text" id="childName" name="childName" required>
+        </div>
+        <div class="form-group">
+            <label for="studentId">Student ID</label>
+            <input type="text" id="studentId" name="studentId" required placeholder="e.g., STU2025004">
+        </div>
+        <div class="form-group">
+            <label for="relationship">Relationship to Student</label>
+            <select id="relationship" name="relationship" required>
+                <option value="">Select relationship</option>
+                <option value="Mother">Mother</option>
+                <option value="Father">Father</option>
+                <option value="Guardian">Legal Guardian</option>
+                <option value="Step Mother">Step Mother</option>
+                <option value="Step Father">Step Father</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    
+    <div id="response">
+        <p>API Response will appear here...</p>
+    </div>
+    
+    <script>
+        document.getElementById('skipVerification').addEventListener('click', function() {
+            // Get the email from the form
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter an email address first');
+                document.getElementById('email').focus();
+                return;
+            }
+            
+            // Add a session storage flag to indicate we want to skip verification
+            sessionStorage.setItem('skip_verification', 'true');
+            alert('Email verification will be overridden for testing purposes. The next registration attempt will bypass verification.');
+            
+            // Make a server call to set the session variables
+            fetch('set_test_session.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=set_verified&email=${encodeURIComponent(email)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.success) {
+                    document.getElementById('response').innerHTML = '<p class="success">Verification bypass enabled. Try registering now.</p>';
+                } else {
+                    document.getElementById('response').innerHTML = '<p class="error">Failed to enable verification bypass: ' + data.message + '</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('response').innerHTML = '<p class="error">Error enabling verification bypass: ' + error.message + '</p>';
+            });
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('action', 'register');
+            formData.append('fullName', document.getElementById('fullName').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('password', document.getElementById('password').value);
+            formData.append('confirmPassword', document.getElementById('confirmPassword').value);
+            formData.append('childName', document.getElementById('childName').value);
+            formData.append('studentId', document.getElementById('studentId').value);
+            formData.append('relationship', document.getElementById('relationship').value);
+            
+            document.getElementById('response').innerHTML = '<p>Submitting...</p>';
+            
+            fetch('bypass_parent_auth.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Log raw response for debugging
+                response.clone().text().then(text => console.log('Raw response:', text));
+                
+                // Try to parse as JSON
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                if (data.success) {
+                    document.getElementById('response').innerHTML = '<p class="success">Registration successful!</p><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } else {
+                    document.getElementById('response').innerHTML = '<p class="error">Registration failed: ' + data.message + '</p><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('response').innerHTML = '<p class="error">An error occurred: ' + error.message + '</p>';
+            });
+        });
+    </script>
+</body>
+</html> 

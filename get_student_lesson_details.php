@@ -28,7 +28,7 @@ if (!$lesson_id) {
 
 try {
     // Check if connection exists
-    if (!isset($conn)) {
+    if (!isset($pdo)) {
         throw new Exception('Database connection not available');
     }
     
@@ -38,11 +38,9 @@ try {
               JOIN classes c ON l.class_id = c.id
               WHERE l.id = ?";
     
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $lesson_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $lesson = $result->fetch_assoc();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$lesson_id]);
+    $lesson = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$lesson) {
         echo json_encode(['success' => false, 'message' => 'Lesson not found']);
@@ -51,13 +49,11 @@ try {
     
     // Get associated files
     $file_query = "SELECT * FROM lesson_files WHERE lesson_id = ?";
-    $file_stmt = $conn->prepare($file_query);
-    $file_stmt->bind_param("i", $lesson_id);
-    $file_stmt->execute();
-    $file_result = $file_stmt->get_result();
+    $file_stmt = $pdo->prepare($file_query);
+    $file_stmt->execute([$lesson_id]);
     
     $lesson['files'] = [];
-    while ($file = $file_result->fetch_assoc()) {
+    while ($file = $file_stmt->fetch(PDO::FETCH_ASSOC)) {
         $lesson['files'][] = $file;
     }
     

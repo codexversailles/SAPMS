@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #response {
+            white-space: pre-wrap;
+            background: #f5f5f5;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        h2 {
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>AJAX Testing Tool</h1>
+    
+    <h2>Test Simple Response</h2>
+    <button id="testSimple">Test Simple Response</button>
+    
+    <h2>Test Email Verification</h2>
+    <div>
+        <label for="testEmail">Email:</label>
+        <input type="email" id="testEmail" value="test@example.com">
+    </div>
+    <div style="margin-top: 10px;">
+        <button id="testSendCode">Send Verification Code</button>
+        <button id="testVerifyCode">Verify Code</button>
+        <input type="text" id="testCode" placeholder="Enter code">
+    </div>
+    
+    <h2>Response</h2>
+    <div id="response"></div>
+    
+    <h2>Response Headers</h2>
+    <div id="headers"></div>
+    
+    <script>
+        // Utility function to display response
+        function displayResponse(data, error = false) {
+            const responseElem = document.getElementById('response');
+            if (error) {
+                responseElem.innerHTML = `<div class="error">${data}</div>`;
+            } else {
+                responseElem.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+        
+        // Display headers
+        function displayHeaders(headers) {
+            const headersElem = document.getElementById('headers');
+            let html = '';
+            headers.forEach((value, key) => {
+                html += `<div><strong>${key}:</strong> ${value}</div>`;
+            });
+            headersElem.innerHTML = html;
+        }
+        
+        // Handle basic test
+        document.getElementById('testSimple').addEventListener('click', function() {
+            fetch('test_response.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Cache-Control': 'no-cache'
+                },
+                body: 'action=test&data=testing123'
+            })
+            .then(response => {
+                // Display headers
+                displayHeaders(response.headers);
+                
+                // Check content type
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json().then(data => {
+                        displayResponse(data);
+                        return { success: true, data };
+                    }).catch(error => {
+                        return response.text().then(text => {
+                            displayResponse(`JSON Parse Error: ${error.message}\n\nRaw response:\n${text}`, true);
+                            throw new Error("Invalid JSON");
+                        });
+                    });
+                } else {
+                    return response.text().then(text => {
+                        displayResponse(`Invalid content type: ${contentType || 'not set'}\n\nRaw response:\n${text}`, true);
+                        throw new Error("Invalid content type");
+                    });
+                }
+            })
+            .catch(error => {
+                displayResponse(`Error: ${error.message}`, true);
+            });
+        });
+        
+        // Handle send code test
+        document.getElementById('testSendCode').addEventListener('click', function() {
+            const email = document.getElementById('testEmail').value;
+            
+            fetch('email_verification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Cache-Control': 'no-cache'
+                },
+                body: `action=send_verification_code&email=${encodeURIComponent(email)}&is_login=false`
+            })
+            .then(response => {
+                // Display headers
+                displayHeaders(response.headers);
+                
+                // Try to parse as JSON first
+                return response.text().then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        displayResponse(data);
+                        return { success: true, data };
+                    } catch (e) {
+                        displayResponse(`JSON Parse Error: ${e.message}\n\nRaw response:\n${text}`, true);
+                        throw new Error("Invalid JSON");
+                    }
+                });
+            })
+            .catch(error => {
+                displayResponse(`Error: ${error.message}`, true);
+            });
+        });
+        
+        // Handle verify code test
+        document.getElementById('testVerifyCode').addEventListener('click', function() {
+            const code = document.getElementById('testCode').value;
+            
+            fetch('email_verification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Cache-Control': 'no-cache'
+                },
+                body: `action=verify_code&code=${encodeURIComponent(code)}`
+            })
+            .then(response => {
+                // Display headers
+                displayHeaders(response.headers);
+                
+                // Try to parse as JSON first
+                return response.text().then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        displayResponse(data);
+                        return { success: true, data };
+                    } catch (e) {
+                        displayResponse(`JSON Parse Error: ${e.message}\n\nRaw response:\n${text}`, true);
+                        throw new Error("Invalid JSON");
+                    }
+                });
+            })
+            .catch(error => {
+                displayResponse(`Error: ${error.message}`, true);
+            });
+        });
+    </script>
+</body>
+</html> 

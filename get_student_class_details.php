@@ -44,20 +44,19 @@ $response = [
 
 try {
     // Log connection status
-    if (!isset($conn)) {
+    if (!isset($pdo)) {
         throw new Exception('Database connection not available');
     }
     
     // Get lessons for the class
-    $stmt = $conn->prepare("SELECT id, title, description, created_at 
+    $stmt = $pdo->prepare("SELECT id, title, description, created_at 
                            FROM lessons 
                            WHERE class_id = ? 
                            ORDER BY created_at DESC");
-    $stmt->bind_param("i", $class_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$class_id]);
+    $lessons = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
+    foreach ($lessons as $row) {
         $response['lessons'][] = [
             'id' => $row['id'],
             'title' => $row['title'],
@@ -67,15 +66,14 @@ try {
     }
     
     // Get assessments for the class
-    $stmt = $conn->prepare("SELECT id, title, description, due_date, created_at, max_score 
+    $stmt = $pdo->prepare("SELECT id, title, description, due_date, created_at, max_score 
                            FROM assessments 
                            WHERE class_id = ? 
                            ORDER BY due_date ASC, created_at DESC");
-    $stmt->bind_param("i", $class_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$class_id]);
+    $assessments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    while ($row = $result->fetch_assoc()) {
+    foreach ($assessments as $row) {
         $assessment = [
             'id' => $row['id'],
             'title' => $row['title'],
@@ -86,15 +84,13 @@ try {
         ];
         
         // Get student's submission for this assessment if it exists
-        $submissionStmt = $conn->prepare("SELECT id, submission_date, score, teacher_feedback 
+        $submissionStmt = $pdo->prepare("SELECT id, submission_date, score, teacher_feedback 
                                          FROM student_submissions 
                                          WHERE assessment_id = ? AND student_id = ?");
-        $submissionStmt->bind_param("ii", $row['id'], $student_id);
-        $submissionStmt->execute();
-        $submissionResult = $submissionStmt->get_result();
+        $submissionStmt->execute([$row['id'], $student_id]);
+        $submission = $submissionStmt->fetch(PDO::FETCH_ASSOC);
         
-        if ($submissionResult->num_rows > 0) {
-            $submission = $submissionResult->fetch_assoc();
+        if ($submission) {
             $assessment['student_submission'] = [
                 'id' => $submission['id'],
                 'submission_date' => $submission['submission_date'],

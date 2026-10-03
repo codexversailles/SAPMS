@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Details Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, button {
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 15px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Class Details API Tester</h1>
+    
+    <fieldset>
+        <legend>Test Parameters</legend>
+        
+        <div class="form-group">
+            <label for="classId">Class ID:</label>
+            <input type="number" id="classId" value="1" min="1">
+        </div>
+        
+        <button id="testBtn">Test Class Details</button>
+    </fieldset>
+    
+    <div id="result">Results will appear here...</div>
+    
+    <script>
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const classId = document.getElementById('classId').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = 'Loading...';
+            resultDiv.className = '';
+            
+            try {
+                // Make the fetch request
+                const response = await fetch(`get_class_details.php?id=${classId}`);
+                const responseText = await response.text();
+                
+                // Try to parse as JSON
+                try {
+                    const data = JSON.parse(responseText);
+                    
+                    if (data.success) {
+                        resultDiv.innerHTML = `<span class="success">SUCCESS!</span>\n\nAPI Response:\n${JSON.stringify(data, null, 2)}`;
+                    } else {
+                        resultDiv.innerHTML = `<span class="error">API ERROR:</span>\n\n${JSON.stringify(data, null, 2)}`;
+                    }
+                } catch (jsonError) {
+                    // Not valid JSON
+                    resultDiv.innerHTML = `<span class="error">INVALID JSON RESPONSE:</span>\n\n${responseText}`;
+                    console.error('JSON Parse Error:', jsonError);
+                }
+            } catch (fetchError) {
+                resultDiv.innerHTML = `<span class="error">FETCH ERROR:</span>\n\n${fetchError.message}`;
+                console.error('Fetch Error:', fetchError);
+            }
+        });
+        
+        // Add some test class IDs
+        const testIds = [2, 3, 12]; // Add your problematic class IDs here
+        const fieldset = document.querySelector('fieldset');
+        
+        const quickLinksDiv = document.createElement('div');
+        quickLinksDiv.className = 'form-group';
+        quickLinksDiv.innerHTML = '<label>Quick Test Links:</label>';
+        
+        testIds.forEach(id => {
+            const button = document.createElement('button');
+            button.textContent = `Class ID ${id}`;
+            button.style.marginRight = '10px';
+            button.style.marginTop = '5px';
+            
+            button.addEventListener('click', () => {
+                document.getElementById('classId').value = id;
+                document.getElementById('testBtn').click();
+            });
+            
+            quickLinksDiv.appendChild(button);
+        });
+        
+        fieldset.appendChild(quickLinksDiv);
+    </script>
+</body>
+</html> 

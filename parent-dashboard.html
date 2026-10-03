@@ -12,87 +12,18 @@
     <style>
         /* Dashboard specific styles */
         .dashboard-container {
-            display: flex;
             min-height: calc(100vh - 70px);
-        }
-        
-        .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px 0;
-            position: fixed;
-            height: calc(100vh - 70px);
-            overflow-y: auto;
-            top: 70px;
-        }
-        
-        .main-content {
-            flex: 1;
-            margin-left: 250px;
             padding: 20px;
             background-color: #f5f7fa;
             margin-top: 70px;
         }
         
-        .user-profile {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid #34495e;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .user-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            font-size: 32px;
-            color: white;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .user-id {
-            font-size: 14px;
-            color: #bdc3c7;
-        }
-        
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .nav-item {
-            padding: 0;
-            margin: 0;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: #ecf0f1;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        
-        .nav-link:hover, .nav-link.active {
-            background-color: #34495e;
-        }
-        
-        .nav-link i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
+        /* Additional override to forcefully hide delete buttons */
+        .child-card i.fa-trash,
+        .child-card .btn-delete,
+        .child-card button[onclick*="removeChild"],
+        .child-card .child-actions {
+            display: none !important;
         }
         
         .dashboard-header {
@@ -111,6 +42,7 @@
         .dashboard-actions {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
         
         .dashboard-card {
@@ -177,11 +109,12 @@
             background-color: #2980b9;
         }
         
-        /* Children cards styles */
+        /* Children cards styles - modified for tab-like appearance */
         .children-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 15px;
             margin-top: 20px;
         }
 
@@ -189,87 +122,1132 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px;
+            padding: 12px 15px;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
             text-decoration: none;
             color: inherit;
+            display: flex;
+            align-items: center;
+            border-left: 4px solid #3498db;
+            max-width: 280px;
+            width: calc(50% - 15px);
+        }
+        
+        /* Hide delete buttons in child cards */
+        .child-card .btn-delete {
+            display: none !important;
         }
 
         .child-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            background-color: #f5f9ff;
+        }
+        
+        .child-card.active {
+            background-color: #f0f8ff;
+            box-shadow: 0 2px 15px rgba(52, 152, 219, 0.2);
+            border-left: 4px solid #2980b9;
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 768px) {
+            .child-card {
+                width: 100%;
+                max-width: none;
+            }
         }
 
         .child-avatar {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background-color: #3498db;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 24px;
+            font-size: 18px;
             color: white;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .child-info {
+            flex: 1;
         }
 
         .child-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #2c3e50;
-            text-align: center;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .child-id {
-            font-size: 14px;
+            font-size: 13px;
             color: #7f8c8d;
-            text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 2px;
         }
 
         .child-relationship {
-            font-size: 14px;
+            font-size: 13px;
             color: #3498db;
-            text-align: center;
             font-style: italic;
         }
         
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                padding: 20px 0;
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar-sm {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 16px;
+            color: white;
             }
             
-            .sidebar .user-name, .sidebar .user-id, .sidebar .nav-link span {
+        .logout-btn {
+            margin-left: auto;
+            background-color: #e74c3c;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Add Child button and modal styles */
+        .add-child-btn {
+            margin-left: auto;
+            background-color: #27ae60;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-child-btn:hover {
+            background-color: #219653;
+        }
+        
+        .modal {
                 display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
             }
             
-            .user-avatar {
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: #3498db;
+        }
+        
+        .modal-title {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-submit {
+            text-align: right;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            display: none;
+            z-index: 1500;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .notification.success {
+            background-color: #2ecc71;
+        }
+        
+        .notification.error {
+            background-color: #e74c3c;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .child-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Child detail section - enhanced styling */
+        #child-detail-section {
+            display: none;
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+            
+        .detail-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .detail-tab {
+            padding: 12px 20px;
+            background-color: transparent;
+            border: none;
+            margin-right: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+            border-radius: 6px;
+        }
+        
+        .detail-tab:hover {
+            background-color: #f5f7fa;
+            color: #3498db;
+        }
+        
+        .detail-tab.active {
+            background-color: #3498db;
+            color: white;
+            margin-bottom: 0;
+        }
+        
+        .detail-tab i {
+            margin-right: 8px;
+        }
+        
+        .detail-content {
+            display: none;
+            padding: 25px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .detail-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .child-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .child-header .child-avatar {
+            width: 60px;
+            height: 60px;
+            margin-right: 20px;
+            margin-bottom: 0;
+            background-color: #3498db;
+            font-size: 24px;
+        }
+        
+        .child-header h3 {
+            margin: 0;
+            font-size: 22px;
+            color: #2c3e50;
+        }
+        
+        .child-header .child-id {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        /* Table styles - enhanced */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background-color: #f0f4f8;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+            }
+            
+        .data-table tbody tr {
+            border-bottom: 1px solid #ecf0f1;
+            transition: background-color 0.2s ease;
+        }
+        
+        .data-table tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .data-table td {
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-table .score {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .data-table .good-score {
+            color: #27ae60;
+            background-color: rgba(39, 174, 96, 0.1);
+        }
+        
+        .data-table .average-score {
+            color: #f39c12;
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+        
+        .data-table .poor-score {
+            color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .data-table .no-score {
+            color: #7f8c8d;
+            background-color: rgba(127, 140, 141, 0.1);
+        }
+        
+        /* Class cards - enhanced */
+        .class-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #3498db;
+        }
+        
+        .class-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .class-card h4 {
+            margin-top: 0;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .class-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .class-code {
+            background-color: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .message-teacher-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.2s ease;
+            margin-left: 10px;
+        }
+        
+        .message-teacher-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .message-teacher-btn i {
+            font-size: 12px;
+        }
+        
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #7f8c8d;
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .teacher-info i {
+            margin-right: 8px;
+            color: #3498db;
+            font-size: 16px;
+        }
+        
+        /* Empty states - enhanced */
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #7f8c8d;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            border: 1px dashed #d1d8e0;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .empty-state p {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        
+        .empty-state p:first-of-type {
+            font-weight: 600;
+            color: #34495e;
+            font-size: 17px;
+        }
+        
+        /* Loading indicators */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+        
+        .loading i {
+            margin-right: 8px;
+            animation: spin 1s infinite linear;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Date formatting */
+        .date {
+            white-space: nowrap;
+            color: #7f8c8d;
+        }
+        
+        /* Text truncation for long content */
+        .truncate {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+        
+        .remove-child-btn {
+            background-color: #e74c3c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .remove-child-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Remove children list styles */
+        .remove-children-list {
+            margin-top: 20px;
+        }
+        
+        .remove-child-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .remove-child-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remove-child-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .confirm-remove-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        
+        .confirm-remove-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Chat Box Styles - Enhanced */
+        .chat-box {
+            position: fixed;
+            bottom: -600px;
+            right: 30px;
+            width: 350px;
+            height: 450px;
+            background-color: white;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .chat-box.open {
+            bottom: 0;
+        }
+        
+        .chat-box.minimized {
+            height: 50px;
+        }
+        
+        .chat-header {
+            background-color: #3498db;
+            color: white;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            }
+            
+        .chat-title i {
+            font-size: 18px;
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chat-action-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .chat-action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .chat-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 3px;
+        }
+        
+        .chat-date-separator {
+            text-align: center;
+            margin: 12px 0;
+            position: relative;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+        
+        .chat-date-separator:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e0e0e0;
+            z-index: -1;
+        }
+        
+        .chat-date-separator span {
+            background-color: #f8f9fa;
+            padding: 0 10px;
+            border-radius: 10px;
+        }
+        
+        .chat-message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+            }
+            
+        .chat-message.sent {
+            align-self: flex-end;
+        }
+        
+        .chat-message.received {
+            align-self: flex-start;
+        }
+        
+        .chat-message.system-message {
+            align-self: center;
+            max-width: 90%;
+        }
+        
+        .message-bubble {
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+            word-break: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .sent .message-bubble {
+            background-color: #3498db;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .sent .message-bubble.error {
+            background-color: #e74c3c;
+        }
+        
+        .received .message-bubble {
+            background-color: white;
+            border-bottom-left-radius: 4px;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .system-message .message-content {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #7f8c8d;
+            text-align: center;
+            border: 1px dashed #ddd;
+        }
+        
+        .message-text {
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            text-align: right;
+            opacity: 0.8;
+        }
+        
+        .received .message-time {
+            color: #7f8c8d;
+        }
+        
+        .message-info {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #95a5a6;
+        }
+        
+        .chat-input-container {
+            padding: 12px;
+            background-color: white;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #ecf0f1;
+            align-items: center;
+        }
+        
+        #parent-message-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            max-height: 100px;
+            min-height: 24px;
+        }
+        
+        #parent-message-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        #send-message-btn {
                 width: 40px;
                 height: 40px;
-                font-size: 18px;
+            border-radius: 50%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            flex-shrink: 0;
+        }
+        
+        #send-message-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        #send-message-btn:active {
+            transform: scale(0.95);
             }
             
-            .nav-link {
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
                 justify-content: center;
-                padding: 15px 0;
+            padding: 30px 0;
+            color: #7f8c8d;
+            gap: 15px;
             }
             
-            .nav-link i {
-                margin-right: 0;
-                font-size: 20px;
+        .loading-state i {
+            font-size: 24px;
+            color: #3498db;
+            animation: spin 1s infinite linear;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px 0;
+            color: #7f8c8d;
             }
             
-            .main-content {
-                margin-left: 70px;
+        .empty-state p {
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 0;
+        }
+        
+        /* For mobile view */
+        @media (max-width: 768px) {
+            .chat-box {
+                width: 100%;
+                right: 0;
+                border-radius: 16px 16px 0 0;
+                max-width: 100%;
+            }
+            
+            .chat-box.open {
+                bottom: 0;
+            }
+            
+            .chat-message {
+                max-width: 90%;
+            }
+        }
+        
+        /* Announcement styles */
+        .priority-urgent {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .priority-important {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        .btn-view {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-view:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Announcement modal styles */
+        .announcement-modal {
+            max-width: 700px;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .announcement-header {
+            background-color: #f5f7fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+        }
+        
+        .announcement-header.priority-urgent {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .announcement-header.priority-important {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left: 4px solid #f39c12;
+        }
+        
+        .announcement-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .announcement-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .announcement-body {
+            padding: 20px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .announcement-files {
+            padding: 0 20px 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        .announcement-files .no-files {
+            text-align: center;
+            padding: 15px;
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 14px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .file-item i {
+            font-size: 16px;
+            color: #3498db;
+            margin-right: 10px;
+        }
+        
+        .file-name {
+            flex: 1;
+        }
+        
+        .file-download {
+            color: white;
+            background-color: #27ae60;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Filter controls styles */
+        .filter-controls {
+            margin-bottom: 15px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9fafb;
+            color: #2c3e50;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group select {
+                flex: 1;
             }
         }
     </style>
 </head>
 <body>
+    <div id="notification" class="notification"></div>
     <nav class="navbar">
         <div class="logo">SAP-MS</div>
         <ul class="nav-links">
@@ -285,77 +1263,24 @@
     </nav>
 
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="user-profile">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="user-name">Parent Name</div>
-            </div>
-            
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#dashboard" class="nav-link active">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#children" class="nav-link">
-                        <i class="fas fa-child"></i>
-                        <span>My Children</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#grades" class="nav-link">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Grades</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#attendance" class="nav-link">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Attendance</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#messages" class="nav-link">
-                        <i class="fas fa-envelope"></i>
-                        <span>Messages</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#profile" class="nav-link">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Profile</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="parent-auth.html" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
         <!-- Main Content -->
-        <div class="main-content">
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Dashboard</h1>
                 <div class="dashboard-actions">
-                    <button class="btn-primary">
-                        <i class="fas fa-bell"></i>
-                        <span>Notifications</span>
+                <button class="btn-primary logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
                     </button>
                 </div>
             </div>
 
             <!-- Dashboard Overview -->
             <div class="dashboard-card">
-                <div class="card-header">
-                    <h2 class="card-title">Welcome Back, <span class="user-name">Parent Name</span>!</h2>
+            <div class="user-info">
+                <div class="user-avatar-sm">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2>Welcome, <span class="user-name">Parent Name</span>!</h2>
                 </div>
                 <p>Here's an overview of your children's academic progress.</p>
             </div>
@@ -364,50 +1289,284 @@
             <div class="dashboard-card">
                 <div class="card-header">
                     <h2 class="card-title">My Children</h2>
-                    <a href="#children" class="card-action">View All</a>
+                    <div class="dashboard-actions">
+                        <button id="removeChildBtn" class="btn-primary remove-child-btn">
+                            <i class="fas fa-minus"></i>
+                            <span>Remove Child</span>
+                        </button>
+                        <button id="addChildBtn" class="btn-primary add-child-btn">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Child</span>
+                        </button>
+                    </div>
                 </div>
                 <div id="children-container" class="children-grid">
                     <!-- Children cards will be dynamically inserted here -->
                 </div>
-            </div>
-
-            <!-- Recent Grades -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2 class="card-title">Recent Grades</h2>
-                    <a href="#grades" class="card-action">View All</a>
-                </div>
-                <div class="empty-state">
-                    <i class="fas fa-chart-bar"></i>
-                    <p>No grades available yet</p>
-                    <p>Your children's grades will appear here</p>
+            
+            <!-- Child Detail Section -->
+            <div id="child-detail-section">
+                <div class="child-header">
+                    <div class="child-avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <h3 id="detail-child-name"></h3>
+                        <p class="child-id" id="detail-child-id"></p>
                 </div>
             </div>
 
-            <!-- Attendance Overview -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2 class="card-title">Attendance Overview</h2>
-                    <a href="#attendance" class="card-action">View All</a>
+                <div class="detail-tabs">
+                    <div class="detail-tab active" data-tab="classes">
+                        <i class="fas fa-chalkboard"></i>Classes
                 </div>
-                <div class="empty-state">
-                    <i class="fas fa-calendar-check"></i>
-                    <p>No attendance records yet</p>
-                    <p>Your children's attendance will appear here</p>
+                    <div class="detail-tab" data-tab="assessments">
+                        <i class="fas fa-tasks"></i>Assessments
+                    </div>
+                    <div class="detail-tab" data-tab="lessons">
+                        <i class="fas fa-book-open"></i>Lessons
+                </div>
+                    <div class="detail-tab" data-tab="announcements">
+                        <i class="fas fa-bullhorn"></i>Announcements
                 </div>
             </div>
 
-            <!-- Recent Messages -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2 class="card-title">Recent Messages</h2>
-                    <a href="#messages" class="card-action">View All</a>
+                <div class="detail-content active" id="classes-content">
+                    <div id="classes-container">
+                        <!-- Classes will be inserted here -->
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i> Loading classes...
                 </div>
+                </div>
+            </div>
+
+                <div class="detail-content" id="assessments-content">
+                    <div class="filter-controls">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="assessment-class-filter">Subject:</label>
+                                <select id="assessment-class-filter">
+                                    <option value="all">All Subjects</option>
+                                    <!-- Classes will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="assessment-teacher-filter">Teacher:</label>
+                                <select id="assessment-teacher-filter">
+                                    <option value="all">All Teachers</option>
+                                    <!-- Teachers will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="assessment-sort-order">Sort by:</label>
+                                <select id="assessment-sort-order">
+                                    <option value="due-desc">Due Date (Newest)</option>
+                                    <option value="due-asc">Due Date (Oldest)</option>
+                                    <option value="score-desc">Score (Highest)</option>
+                                    <option value="score-asc">Score (Lowest)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Title</th>
+                                    <th>Due Date</th>
+                                    <th>Score</th>
+                                    <th>Feedback</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assessments-container">
+                                <!-- Assessments will be inserted here -->
+                                <tr>
+                                    <td colspan="5" class="loading">
+                                        <i class="fas fa-spinner"></i> Loading assessments...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                </div>
+                </div>
+
+                <div class="detail-content" id="lessons-content">
+                    <div class="filter-controls">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="lesson-class-filter">Subject:</label>
+                                <select id="lesson-class-filter">
+                                    <option value="all">All Subjects</option>
+                                    <!-- Classes will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="lesson-teacher-filter">Teacher:</label>
+                                <select id="lesson-teacher-filter">
+                                    <option value="all">All Teachers</option>
+                                    <!-- Teachers will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="lesson-sort-order">Sort by:</label>
+                                <select id="lesson-sort-order">
+                                    <option value="date-desc">Date Added (Newest)</option>
+                                    <option value="date-asc">Date Added (Oldest)</option>
+                                    <option value="title-asc">Title (A-Z)</option>
+                                    <option value="title-desc">Title (Z-A)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Title</th>
+                                    <th>Date Added</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lessons-container">
+                                <!-- Lessons will be inserted here -->
+                                <tr>
+                                    <td colspan="4" class="loading">
+                                        <i class="fas fa-spinner"></i> Loading lessons...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                </div>
+                </div>
+
+                <div class="detail-content" id="announcements-content">
+                    <div class="filter-controls">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="announcement-class-filter">Subject:</label>
+                                <select id="announcement-class-filter">
+                                    <option value="all">All Subjects</option>
+                                    <!-- Classes will be populated dynamically -->
+                                </select>
+            </div>
+                            <div class="filter-group">
+                                <label for="announcement-visibility-filter">Visibility:</label>
+                                <select id="announcement-visibility-filter">
+                                    <option value="all">All</option>
+                                    <option value="parents">Parent Only</option>
+                                    <option value="class">Class</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="announcement-sort-order">Sort by:</label>
+                                <select id="announcement-sort-order">
+                                    <option value="date-desc">Date (Newest)</option>
+                                    <option value="date-asc">Date (Oldest)</option>
+                                    <option value="priority-desc">Priority (Highest)</option>
+                                    <option value="priority-asc">Priority (Lowest)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Title</th>
+                                    <th>Date Posted</th>
+                                    <th>Priority</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="announcements-container">
+                                <!-- Announcements will be inserted here -->
+                                <tr>
+                                    <td colspan="5" class="loading">
+                                        <i class="fas fa-spinner"></i> Loading announcements...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+
+    <!-- Add Child Modal -->
+    <div id="addChildModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 class="modal-title">Add a Child</h3>
+            <form id="addChildForm">
+                <div class="form-group">
+                    <label for="studentId">Student ID</label>
+                    <input type="text" id="studentId" required placeholder="Enter student ID (e.g., STU2025001)">
+                </div>
+                <div class="form-group">
+                    <label for="relationship">Relationship to Student</label>
+                    <select id="relationship" required>
+                        <option value="">Select relationship</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Father">Father</option>
+                        <option value="Guardian">Legal Guardian</option>
+                        <option value="Step Mother">Step Mother</option>
+                        <option value="Step Father">Step Father</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-submit">
+                    <button type="submit" class="btn-primary">Add Child</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Remove Child Modal -->
+    <div id="removeChildModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 class="modal-title">Remove a Child</h3>
+            <div id="remove-children-list" class="remove-children-list">
+                <!-- Children will be listed here -->
+                <div class="loading">
+                    <i class="fas fa-spinner"></i> Loading children...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sliding Chat Box -->
+    <div id="chat-box" class="chat-box">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fas fa-comments"></i>
+                <span id="chat-title-text">Message to Teacher</span>
+            </div>
+            <div class="chat-actions">
+                <button id="minimize-chat" class="chat-action-btn" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button id="close-chat" class="chat-action-btn" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chat-body">
+            <div id="chat-messages" class="chat-messages">
+                <!-- Messages will be displayed here -->
                 <div class="empty-state">
-                    <i class="fas fa-envelope"></i>
-                    <p>No messages yet</p>
-                    <p>Your messages will appear here</p>
+                    <p>No messages yet. Start the conversation!</p>
                 </div>
+            </div>
+            <div class="chat-input-container">
+                <textarea id="parent-message-input" placeholder="Type your message here..." rows="1"></textarea>
+                <button id="send-message-btn" title="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -417,6 +1576,229 @@
         // Mobile menu toggle
         document.querySelector('.hamburger').addEventListener('click', function() {
             document.querySelector('.nav-links').classList.toggle('active');
+        });
+        
+        // Logout button
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            handleLogout();
+        });
+        
+        // Modal functionality
+        const modal = document.getElementById('addChildModal');
+        const addChildBtn = document.getElementById('addChildBtn');
+        const closeBtn = document.querySelector('.close-modal');
+        
+        // Remove Child Modal
+        const removeChildModal = document.getElementById('removeChildModal');
+        const removeChildBtn = document.getElementById('removeChildBtn');
+        const removeModalCloseBtn = removeChildModal.querySelector('.close-modal');
+        
+        addChildBtn.onclick = function() {
+            modal.style.display = 'block';
+        }
+        
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        removeChildBtn.onclick = function() {
+            // Load children into the remove modal
+            loadChildrenForRemoval();
+            removeChildModal.style.display = 'block';
+        }
+        
+        removeModalCloseBtn.onclick = function() {
+            removeChildModal.style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+            if (event.target == removeChildModal) {
+                removeChildModal.style.display = 'none';
+            }
+            const announcementModal = document.getElementById('viewAnnouncementModal');
+            if (announcementModal && event.target == announcementModal) {
+                announcementModal.style.display = 'none';
+            }
+        }
+        
+        // Function to load children into the remove modal
+        function loadChildrenForRemoval() {
+            const removeChildrenList = document.getElementById('remove-children-list');
+            removeChildrenList.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> Loading children...</div>';
+            
+            fetch('get-parent-data.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.children && data.children.length > 0) {
+                        removeChildrenList.innerHTML = '';
+                        
+                        data.children.forEach(child => {
+                            const childItem = document.createElement('div');
+                            childItem.className = 'remove-child-item';
+                            childItem.innerHTML = `
+                                <div class="remove-child-info">
+                                    <div class="remove-child-avatar">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <div>
+                                        <div class="child-name">${child.full_name}</div>
+                                        <div class="child-id">ID: ${child.student_id}</div>
+                                    </div>
+                                </div>
+                                <button class="confirm-remove-btn" data-child-id="${child.id}">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            `;
+                            
+                            removeChildrenList.appendChild(childItem);
+                            
+                            // Add event listener to the remove button
+                            childItem.querySelector('.confirm-remove-btn').addEventListener('click', function() {
+                                const childId = this.getAttribute('data-child-id');
+                                removeChild(childId);
+                                removeChildModal.style.display = 'none';
+                            });
+                        });
+                    } else {
+                        removeChildrenList.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-child"></i>
+                                <p>No children registered yet</p>
+                                <p>Add children first</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    removeChildrenList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Error loading children</p>
+                            <p>Please try again later</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // Add child form submission
+        document.getElementById('addChildForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('studentId').value;
+            const relationship = document.getElementById('relationship').value;
+            
+            addChild(studentId, relationship);
+        });
+        
+        // Function to add a child
+        function addChild(studentId, relationship) {
+            const formData = new FormData();
+            formData.append('action', 'add_child');
+            formData.append('studentId', studentId);
+            formData.append('relationship', relationship);
+            
+            fetch('parent_manage_children.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message);
+                    modal.style.display = 'none';
+                    
+                    // Add the new child to the display without reloading
+                    addChildToDisplay(data.child);
+                    
+                    // Reset the form
+                    document.getElementById('addChildForm').reset();
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            });
+        }
+        
+        // Function to add a child to the display
+        function addChildToDisplay(child) {
+            const childrenContainer = document.getElementById('children-container');
+            
+            const childCard = document.createElement('div');
+            childCard.className = 'child-card';
+            childCard.id = `child-${child.id}`;
+            childCard.dataset.studentId = child.student_id;
+            childCard.innerHTML = `
+                <div class="child-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="child-info">
+                    <div class="child-name">${child.full_name}</div>
+                    <div class="child-id">ID: ${child.student_id}</div>
+                    <div class="child-relationship">${child.relationship}</div>
+                </div>
+            `;
+            
+            // Make the card clickable
+            childCard.addEventListener('click', function() {
+                loadChildDetails(child.student_id, child.full_name);
+            });
+            
+            childrenContainer.appendChild(childCard);
+        }
+        
+        // Function to remove a child
+        function removeChild(childId) {
+            const formData = new FormData();
+            formData.append('action', 'remove_child');
+            formData.append('childId', childId);
+            
+            fetch('parent_manage_children.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message);
+                    
+                    // Remove the child from the display
+                    const childCard = document.getElementById(`child-${childId}`);
+                    if (childCard) {
+                        childCard.remove();
+                    }
+                    
+                    // Hide detail section if the active child was removed
+                    if (document.querySelectorAll('.child-card').length === 0) {
+                        document.getElementById('child-detail-section').style.display = 'none';
+                    }
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            });
+        }
+        
+        // Tab switching functionality
+        document.querySelectorAll('.detail-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.detail-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-content`).classList.add('active');
+            });
         });
     </script>
 </body>

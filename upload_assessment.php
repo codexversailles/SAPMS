@@ -80,6 +80,33 @@ try {
         }
     }
 
+    // Handle links if any
+    if (!empty($_POST['links'])) {
+        try {
+            $links = json_decode($_POST['links'], true);
+            
+            if (is_array($links) && !empty($links)) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO assessment_links (assessment_id, link_title, link_url)
+                    VALUES (?, ?, ?)
+                ");
+                
+                foreach ($links as $link) {
+                    if (!empty($link['title']) && !empty($link['url'])) {
+                        $stmt->execute([
+                            $assessmentId,
+                            $link['title'],
+                            $link['url']
+                        ]);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            // Log the error but continue execution
+            error_log('Error processing links: ' . $e->getMessage());
+        }
+    }
+
     // Commit transaction
     $pdo->commit();
 

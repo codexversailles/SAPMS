@@ -26,28 +26,33 @@ if (!$assessment_id) {
 
 try {
     // Start transaction
-    $conn->begin_transaction();
+    $pdo->beginTransaction();
     
-    // First, check if the submission exists and belongs to this student
-    $check_query = "SELECT ss.id, sf.file_path 
+    // First, check if the submission exists, belongs to this student, and is not graded
+    $check_query = "SELECT ss.id, ss.score, sf.file_path 
                     FROM student_submissions ss
                     LEFT JOIN submission_files sf ON sf.submission_id = ss.id
                     WHERE ss.student_id = ? AND ss.assessment_id = ?";
     
-    $check_stmt = $conn->prepare($check_query);
-    $check_stmt->bind_param("ii", $student_id, $assessment_id);
-    $check_stmt->execute();
-    $result = $check_stmt->get_result();
+    $check_stmt = $pdo->prepare($check_query);
+    $check_stmt->execute([$student_id, $assessment_id]);
     
-    if ($result->num_rows == 0) {
+    $rows = $check_stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    if (count($rows) == 0) {
         throw new Exception("No submission found for this assessment");
+    }
+    
+    // Check if submission is graded
+    if ($rows[0]['score'] !== null) {
+        throw new Exception("Cannot unsubmit a graded assignment");
     }
     
     // Get the submission ID and file paths
     $submission_id = null;
     $file_paths = [];
     
-    while ($row = $result->fetch_assoc()) {
+    foreach ($rows as $row) {
         if ($submission_id === null) {
             $submission_id = $row['id'];
         }
@@ -67,19 +72,17 @@ try {
     // Delete submission files from database
     if ($submission_id) {
         $delete_files_query = "DELETE FROM submission_files WHERE submission_id = ?";
-        $delete_files_stmt = $conn->prepare($delete_files_query);
-        $delete_files_stmt->bind_param("i", $submission_id);
-        $delete_files_stmt->execute();
+        $delete_files_stmt = $pdo->prepare($delete_files_query);
+        $delete_files_stmt->execute([$submission_id]);
         
         // Delete the submission record
         $delete_submission_query = "DELETE FROM student_submissions WHERE id = ?";
-        $delete_submission_stmt = $conn->prepare($delete_submission_query);
-        $delete_submission_stmt->bind_param("i", $submission_id);
-        $delete_submission_stmt->execute();
+        $delete_submission_stmt = $pdo->prepare($delete_submission_query);
+        $delete_submission_stmt->execute([$submission_id]);
     }
     
     // Commit transaction
-    $conn->commit();
+    $pdo->commit();
     
     echo json_encode([
         'success' => true,
@@ -88,8 +91,8 @@ try {
     
 } catch (Exception $e) {
     // Rollback transaction on error
-    if ($conn->inTransaction()) {
-        $conn->rollback();
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
     }
     
     echo json_encode([

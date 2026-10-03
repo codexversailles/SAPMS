@@ -1,0 +1,12 @@
+[2025-05-16 01:26:53] Retrieving profile picture for student ID: 2025015
+[2025-05-16 01:26:53] No profile picture found for student ID: 2025015
+[2025-05-16 01:26:59] Processing profile picture upload for student ID: 43
+[2025-05-16 01:26:59] File upload details Data: {"name":"The \u201cCatacomb Saints\u201d  \ufe0f  elaborately decorated skeletons of early Christians exhumed from the Roman catacombs in the 16th\u201318th centuries.The skeletons were taken from tombs during this time and covered with gold l.jpg","type":"image\/jpeg","tmp_name":"C:\\xampp\\tmp\\php73F5.tmp","error":0,"size":429187}
+[2025-05-16 01:26:59] File successfully uploaded to: uploads/profile_pictures/68267843eedc9_The “Catacomb Saints”  ️  elaborately decorated skeletons of early Christians exhumed from the Roman catacombs in the 16th–18th centuries.The skeletons were taken from tombs during this time and covered with gold l.jpg
+[2025-05-16 01:26:59] Created new profile picture record
+[2025-05-16 01:27:01] Processing profile picture upload for student ID: 43
+[2025-05-16 01:27:01] Updating position Data: {"position_x":0,"position_y":-10,"zoom":1}
+[2025-05-16 01:27:01] Position updated successfully
+[2025-05-16 01:27:02] Processing profile picture upload for student ID: 43
+[2025-05-16 01:27:02] Updating position Data: {"position_x":0,"position_y":0,"zoom":1}
+[2025-05-16 01:27:02] Position updated successfully

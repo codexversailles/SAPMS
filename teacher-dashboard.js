@@ -238,6 +238,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load user data when the page loads
     loadUserData();
     loadClasses();
+    loadRecentMessages();
+    loadRecentParentMessages();
     
     // Set up navigation event listeners
     document.querySelectorAll('.nav-link').forEach(link => {
@@ -320,15 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
-    // Set up notification button
-    const notificationBtn = document.querySelector('.btn-primary');
-    if (notificationBtn) {
-        notificationBtn.addEventListener('click', function() {
-            // This will be implemented in the future
-            alert('Notifications feature coming soon!');
-        });
-    }
 });
 
 // Function to manage class
@@ -389,6 +382,12 @@ document.getElementById('addAssessmentForm').addEventListener('submit', function
     const files = document.getElementById('assessmentFiles').files;
     for (let i = 0; i < files.length; i++) {
         formData.append('files[]', files[i]);
+    }
+    
+    // Collect and append links
+    const links = collectLinks();
+    if (links.length > 0) {
+        formData.append('links', JSON.stringify(links));
     }
     
     // Show loading state
@@ -457,12 +456,23 @@ function updateAssessmentsGrid(assessments) {
                     </div>
                 </div>
             <div class="lesson-files">
-                    ${(assessment.files && assessment.files.length > 0) ? assessment.files.map(file => `
+                    ${(assessment.files && assessment.files.length > 0) ? `
                     <div class="file-badge">
                         <i class="fas fa-file"></i>
-                        <span>${file.file_name}</span>
-                    </div>
-                    `).join('') : '<div class="file-badge"><i class="fas fa-file-alt"></i><span>No files</span></div>'}
+                        <span>${assessment.files.length} file${assessment.files.length !== 1 ? 's' : ''}</span>
+                    </div>` : ''}
+                    
+                    ${(assessment.links && assessment.links.length > 0) ? `
+                    <div class="file-badge link-badge">
+                        <i class="fas fa-link"></i>
+                        <span>${assessment.links.length} link${assessment.links.length !== 1 ? 's' : ''}</span>
+                    </div>` : ''}
+                    
+                    ${(!assessment.files || assessment.files.length === 0) && (!assessment.links || assessment.links.length === 0) ? `
+                    <div class="file-badge">
+                        <i class="fas fa-file-alt"></i>
+                        <span>No attachments</span>
+                    </div>` : ''}
                 </div>
             </div>
             <div class="lesson-actions">
@@ -770,6 +780,23 @@ function deleteLesson(lessonId) {
 
 // Function to view class details
 function viewClassDetails(classId) {
+    // Set loading state
+    document.getElementById('classDetailsTitle').textContent = 'Loading...';
+    document.getElementById('classDetailsCode').textContent = 'Class Code: Loading...';
+    document.getElementById('classCreatedDate').textContent = 'Created: Loading...';
+    document.getElementById('classStudentCount').textContent = 'Students: Loading...';
+    
+    // Store the class ID as a data attribute for the export button to use
+    document.getElementById('classDetailsModal').setAttribute('data-class-id', classId);
+    
+    // Clear student list
+    document.getElementById('classStudentList').innerHTML = `
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading students...</p>
+        </div>
+    `;
+    
     // Show the modal
     showModal('classDetailsModal');
     
@@ -780,26 +807,29 @@ function viewClassDetails(classId) {
     fetch(`get_class_details.php?id=${classId}`)
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+            console.log('Class details API response:', data);
+            
+            if (data.success && data.class) {
                 const class_ = data.class;
+                console.log('Class data:', class_);
                 
-                // Update modal content
-                document.getElementById('classDetailsTitle').textContent = class_.class_name;
-                document.getElementById('classDetailsCode').textContent = `Class Code: ${class_.class_code}`;
-                document.getElementById('classCreatedDate').textContent = `Created: ${new Date(class_.created_at).toLocaleDateString()}`;
-                document.getElementById('classStudentCount').innerHTML = `<span class="student-count">Students: ${class_.student_count}</span>`;
+                // Update modal content with fallbacks for missing data
+                document.getElementById('classDetailsTitle').textContent = class_.class_name || 'Unnamed Class';
+                document.getElementById('classDetailsCode').textContent = `Class Code: ${class_.class_code || 'N/A'}`;
+                document.getElementById('classCreatedDate').textContent = `Created: ${class_.created_at ? new Date(class_.created_at).toLocaleDateString() : 'Unknown date'}`;
+                document.getElementById('classStudentCount').innerHTML = `<span class="student-count">Students: ${class_.student_count || 0}</span>`;
                 
                 // Update student list
                 const studentList = document.getElementById('classStudentList');
-                if (class_.students.length > 0) {
+                if (class_.students && class_.students.length > 0) {
                     studentList.innerHTML = class_.students.map(student => `
                         <div class="student-item">
                             <div class="student-avatar">
                                 <i class="fas fa-user"></i>
                             </div>
                             <div>
-                                <div>${student.name}</div>
-                                <div style="font-size: 12px; color: #7f8c8d;">${student.email}</div>
+                                <div>${student.name || 'Unnamed Student'}</div>
+                                <div style="font-size: 12px; color: #7f8c8d;">${student.email || 'No email'} (${student.student_id || 'No ID'})</div>
                             </div>
                         </div>
                     `).join('');
@@ -812,7 +842,8 @@ function viewClassDetails(classId) {
                     `;
                 }
             } else {
-                showNotification('Error loading class details', 'error');
+                console.error('Error loading class details:', data);
+                showNotification('Error loading class details: ' + (data.message || 'Unknown error'), 'error');
             }
         })
         .catch(error => {
@@ -862,63 +893,59 @@ function viewAssessmentDetails(assessmentId) {
     // Store the assessment ID for delete functionality
     document.getElementById('assessmentDetailsModal').dataset.assessmentId = assessmentId;
     
-    // Show the modal - keep other modals open (like the manage class modal)
-    showModal('assessmentDetailsModal', true);
-    
-    // Show loading state
+    // Reset modal content
     document.getElementById('assessmentDetailsTitle').textContent = 'Loading...';
-    document.getElementById('assessmentDetailsDescription').textContent = 'Loading assessment details...';
-    document.getElementById('assessmentDetailsFiles').innerHTML = `
-        <div class="empty-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading files...</p>
-        </div>
-    `;
+    document.getElementById('assessmentDetailsDate').textContent = 'Created: Loading...';
+    document.getElementById('assessmentDetailsDescription').textContent = 'Loading...';
+    document.getElementById('assessmentDetailsDueDate').innerHTML = '<i class="fas fa-clock"></i> <span>Loading...</span>';
+    document.getElementById('assessmentDetailsMaxScore').innerHTML = '<i class="fas fa-star"></i> <span>Loading...</span>';
+    document.getElementById('assessmentDetailsFiles').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading files...</div>';
+    document.getElementById('assessmentDetailsLinks').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading links...</div>';
     
-    // Fetch assessment details from server
+    // Show the modal
+    showModal('assessmentDetailsModal');
+    
+    // Configure the view submissions button
+    const viewSubmissionsButton = document.getElementById('viewSubmissionsButton');
+    viewSubmissionsButton.onclick = viewSubmissionsForAssessment;
+    viewSubmissionsButton.dataset.assessmentId = assessmentId;
+    
+    // Fetch assessment details
     fetch(`get_assessment.php?id=${assessmentId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const assessment = data.data;
+                const assessment = data.assessment;
                 
-                // Update modal content
-                document.getElementById('assessmentDetailsTitle').textContent = assessment.title || 'Untitled Assessment';
-                document.getElementById('assessmentDetailsDate').textContent = `Created: ${formatDate(assessment.created_at)}`;
-                document.getElementById('assessmentDetailsDescription').textContent = assessment.description || 'No description provided.';
+                // Update modal content with assessment details
+                document.getElementById('assessmentDetailsTitle').textContent = assessment.title;
+                document.getElementById('assessmentDetailsDate').textContent = `Class: ${assessment.class_name} (${assessment.class_code})`;
+                document.getElementById('assessmentDetailsDescription').textContent = assessment.description || 'No description provided';
                 
-                // Update due date
-                const dueDateDiv = document.getElementById('assessmentDetailsDueDate');
+                // Format due date
                 if (assessment.due_date) {
-                    const isExpired = new Date(assessment.due_date) < new Date();
-                    dueDateDiv.className = `due-date-info ${isExpired ? 'expired' : ''}`;
-                    dueDateDiv.innerHTML = `
+                    const dueDate = new Date(assessment.due_date);
+                    const isExpired = assessment.is_expired;
+                    const formattedDueDate = dueDate.toLocaleString();
+                    
+                    document.getElementById('assessmentDetailsDueDate').innerHTML = `
                         <i class="fas fa-clock"></i>
-                        <span>${isExpired ? 'Expired' : 'Due'}: ${formatDate(assessment.due_date)}</span>
+                        <span class="${isExpired ? 'expired' : ''}">${isExpired ? 'Expired on' : 'Due on'} ${formattedDueDate}</span>
                     `;
                 } else {
-                    dueDateDiv.className = 'due-date-info';
-                    dueDateDiv.innerHTML = `
+                    document.getElementById('assessmentDetailsDueDate').innerHTML = `
                         <i class="fas fa-clock"></i>
                         <span>No due date set</span>
                     `;
                 }
                 
-                // Update max score information
-                const scoreDiv = document.getElementById('assessmentDetailsMaxScore');
-                if (scoreDiv) {
-                    scoreDiv.innerHTML = `
+                // Format max score
+                document.getElementById('assessmentDetailsMaxScore').innerHTML = `
                         <i class="fas fa-star"></i>
-                        <span>Maximum Score: ${assessment.max_score || 100}</span>
+                    <span>${assessment.max_score || 'Not specified'}</span>
                     `;
-                }
                 
-                // Update file list
+                // Display files
                 const fileList = document.getElementById('assessmentDetailsFiles');
                 if (assessment.files && assessment.files.length > 0) {
                     fileList.innerHTML = assessment.files.map(file => `
@@ -940,6 +967,30 @@ function viewAssessmentDetails(assessmentId) {
                         <div class="empty-state">
                             <i class="fas fa-file"></i>
                             <p>No files attached to this assessment</p>
+                        </div>
+                    `;
+                }
+                
+                // Display links
+                const linksList = document.getElementById('assessmentDetailsLinks');
+                if (assessment.links && assessment.links.length > 0) {
+                    linksList.innerHTML = assessment.links.map(link => `
+                        <div class="detail-link-item">
+                            <i class="fas fa-link"></i>
+                            <div class="link-info">
+                                <div class="link-title">${link.link_title}</div>
+                                <div class="link-url">${link.link_url}</div>
+                            </div>
+                            <a href="${link.link_url}" class="btn-open-link" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> Open
+                            </a>
+                        </div>
+                    `).join('');
+                } else {
+                    linksList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-link"></i>
+                            <p>No links attached to this assessment</p>
                         </div>
                     `;
                 }
@@ -1326,4 +1377,1212 @@ function gradeSubmission(submissionId, maxScore) {
         console.error('Error:', error);
         showNotification('An error occurred while grading the submission', 'error');
     });
+}
+
+// Function to load recent messages
+async function loadRecentMessages() {
+    try {
+        const recentMessagesContainer = document.getElementById('recent-messages-container');
+        
+        if (!recentMessagesContainer) {
+            console.error('Recent messages container not found');
+            return;
+        }
+        
+        recentMessagesContainer.innerHTML = `
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading recent messages...</p>
+            </div>
+        `;
+        
+        const response = await fetch('get_teacher_recent_messages.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            displayRecentMessages(data.messages, data.unread_counts);
+        } else {
+            recentMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages: ${data.message}</p>
+                </div>
+            `;
+            console.error('Failed to load recent messages:', data.message);
+        }
+    } catch (error) {
+        const recentMessagesContainer = document.getElementById('recent-messages-container');
+        if (recentMessagesContainer) {
+            recentMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages. Please try again later.</p>
+                </div>
+            `;
+        }
+        console.error('Error loading recent messages:', error);
+    }
+}
+
+// Function to display recent messages
+function displayRecentMessages(messages, unreadCounts) {
+    const recentMessagesContainer = document.getElementById('recent-messages-container');
+    
+    if (!recentMessagesContainer) {
+        console.error('Recent messages container not found');
+        return;
+    }
+    
+    if (!messages || messages.length === 0) {
+        recentMessagesContainer.innerHTML = `
+            <div class="no-messages">
+                <i class="fas fa-inbox"></i>
+                <p>No messages yet</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let messagesHTML = '';
+    
+    messages.forEach(message => {
+        const studentInitial = message.student_name.charAt(0).toUpperCase();
+        const key = `${message.student_id}_${message.class_id}`;
+        const unreadCount = unreadCounts[key] || 0;
+        const isUnread = message.sender_type === 'student' && !message.is_read;
+        const unreadClass = isUnread ? 'message-unread' : '';
+        
+        messagesHTML += `
+            <a href="javascript:void(0)" onclick="openStudentChat(${message.student_id}, ${message.class_id}, '${message.student_name}', '${message.class_name}')" 
+               class="recent-message-item ${unreadClass}">
+                <div class="recent-message-avatar">${studentInitial}</div>
+                <div class="recent-message-content">
+                    <div class="recent-message-header">
+                        <div>
+                            <span class="recent-message-sender">${message.student_name}</span>
+                            <span class="recent-message-class">(${message.class_name})</span>
+                            ${unreadCount > 0 ? `<span class="recent-message-unread-badge">${unreadCount}</span>` : ''}
+                        </div>
+                        <span class="recent-message-time">${message.formatted_time || formatTimeAgo(message.created_at)}</span>
+                    </div>
+                    <div class="recent-message-body">${message.message}</div>
+                </div>
+            </a>
+        `;
+    });
+    
+    recentMessagesContainer.innerHTML = messagesHTML;
+}
+
+// Helper function to format time ago
+function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 24);
+    
+    if (diffDay > 7) {
+        return date.toLocaleDateString();
+    } else if (diffDay > 0) {
+        return `${diffDay} day${diffDay > 1 ? 's' : ''} ago`;
+    } else if (diffHour > 0) {
+        return `${diffHour} hour${diffHour > 1 ? 's' : ''} ago`;
+    } else if (diffMin > 0) {
+        return `${diffMin} minute${diffMin > 1 ? 's' : ''} ago`;
+    } else {
+        return 'Just now';
+    }
+}
+
+// Function to open student chat
+function openStudentChat(studentId, classId, studentName, className) {
+    // Update chat modal with student details
+    document.getElementById('chatStudentName').textContent = studentName;
+    document.getElementById('chatClassName').textContent = className;
+    
+    // Store current student and class ID in the modal for reference
+    const chatModal = document.getElementById('studentChatModal');
+    chatModal.dataset.studentId = studentId;
+    chatModal.dataset.classId = classId;
+    
+    // Clear any previous messages and show loading state
+    const chatMessagesContainer = document.getElementById('chat-messages-container');
+    chatMessagesContainer.innerHTML = `
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading messages...</p>
+        </div>
+    `;
+    
+    // Load chat messages
+    loadTeacherStudentMessages(studentId, classId);
+    
+    // Set up event listener for sending messages if not already set
+    const sendButton = document.getElementById('send-teacher-message-btn');
+    const messageInput = document.getElementById('teacher-message-input');
+    
+    // Remove any existing event listeners to prevent duplicates
+    sendButton.replaceWith(sendButton.cloneNode(true));
+    messageInput.replaceWith(messageInput.cloneNode(true));
+    
+    // Get the new references after replacement
+    const newSendButton = document.getElementById('send-teacher-message-btn');
+    const newMessageInput = document.getElementById('teacher-message-input');
+    
+    // Add event listeners to the new elements
+    newSendButton.addEventListener('click', () => {
+        sendTeacherMessage(studentId, classId);
+    });
+    
+    newMessageInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendTeacherMessage(studentId, classId);
+        }
+    });
+    
+    // Show the modal
+    showModal('studentChatModal');
+}
+
+// Function to close student chat modal
+function closeStudentChatModal() {
+    hideModal('studentChatModal');
+}
+
+// Function to load teacher-student messages
+async function loadTeacherStudentMessages(studentId, classId) {
+    try {
+        const response = await fetch(`get_teacher_student_messages_for_teacher.php?student_id=${studentId}&class_id=${classId}`);
+        const data = await response.json();
+        
+        const chatMessagesContainer = document.getElementById('chat-messages-container');
+        
+        if (data.success) {
+            // Group messages by date
+            const messagesByDate = {};
+            
+            data.messages.forEach(message => {
+                const date = message.formatted_date;
+                if (!messagesByDate[date]) {
+                    messagesByDate[date] = [];
+                }
+                messagesByDate[date].push(message);
+            });
+            
+            // Create HTML for messages
+            let messagesHTML = '';
+            
+            for (const date in messagesByDate) {
+                messagesHTML += `<div class="chat-date-separator">${date}</div>`;
+                
+                messagesByDate[date].forEach(message => {
+                    const isTeacher = message.sender_type === 'teacher';
+                    const messageClass = isTeacher ? 'sent' : 'received';
+                    
+                    messagesHTML += `
+                        <div class="chat-message ${messageClass}">
+                            <div class="message-bubble">
+                                <div class="message-text">${message.message}</div>
+                                <div class="message-time">${message.formatted_time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (messagesHTML === '') {
+                messagesHTML = `
+                    <div class="no-messages">
+                        <p>No messages yet. Start the conversation!</p>
+                    </div>
+                `;
+            }
+            
+            chatMessagesContainer.innerHTML = messagesHTML;
+            
+            // Scroll to the bottom of the messages
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            
+            // Refresh recent messages after viewing - this will update read status
+            setTimeout(loadRecentMessages, 1000);
+            
+        } else {
+            chatMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages: ${data.message}</p>
+                </div>
+            `;
+            console.error('Failed to load messages:', data.message);
+        }
+    } catch (error) {
+        const chatMessagesContainer = document.getElementById('chat-messages-container');
+        chatMessagesContainer.innerHTML = `
+            <div class="no-messages">
+                <p>Error loading messages. Please try again later.</p>
+            </div>
+        `;
+        console.error('Error loading messages:', error);
+    }
+}
+
+// Function to send a message as a teacher
+async function sendTeacherMessage(studentId, classId) {
+    const messageInput = document.getElementById('teacher-message-input');
+    const message = messageInput.value.trim();
+    
+    if (!message) {
+        return;
+    }
+    
+    try {
+        // Clear the input field immediately for better UX
+        messageInput.value = '';
+        
+        // Optimistically add the message to the UI
+        const chatMessagesContainer = document.getElementById('chat-messages-container');
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        
+        // Check if we need to add a new date separator
+        const today = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const lastDateSeparator = chatMessagesContainer.querySelector('.chat-date-separator:last-of-type');
+        
+        if (!lastDateSeparator || lastDateSeparator.textContent !== today) {
+            const dateSeparator = document.createElement('div');
+            dateSeparator.className = 'chat-date-separator';
+            dateSeparator.textContent = today;
+            chatMessagesContainer.appendChild(dateSeparator);
+        }
+        
+        const messageElement = document.createElement('div');
+        messageElement.className = 'chat-message sent';
+        messageElement.innerHTML = `
+            <div class="message-bubble">
+                <div class="message-text">${message}</div>
+                <div class="message-time">${formattedTime}</div>
+            </div>
+        `;
+        
+        chatMessagesContainer.appendChild(messageElement);
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        
+        // Send the message to the server
+        const response = await fetch('send_teacher_message.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                student_id: studentId,
+                class_id: classId,
+                message: message
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            console.error('Failed to send message:', data.message);
+            showNotification(`Error sending message: ${data.message}`, 'error');
+        } else {
+            // Refresh the recent messages in the dashboard after sending
+            setTimeout(loadRecentMessages, 1000);
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        showNotification('Error sending message. Please try again.', 'error');
+    }
+}
+
+// Function to view all messages
+function viewAllMessages() {
+    // Show the 'All Student Messages' modal
+    showModal('allStudentMessagesModal');
+    
+    // Load all student messages
+    loadAllStudentMessages();
 } 
+
+// Function to load all student messages
+async function loadAllStudentMessages() {
+    try {
+        const allMessagesContainer = document.getElementById('all-student-messages-container');
+        
+        if (!allMessagesContainer) {
+            console.error('All student messages container not found');
+            return;
+        }
+        
+        allMessagesContainer.innerHTML = `
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading all messages...</p>
+            </div>
+        `;
+        
+        const response = await fetch('get_all_teacher_student_messages.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            displayAllStudentMessages(data.messages);
+        } else {
+            allMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages: ${data.message}</p>
+                </div>
+            `;
+            console.error('Failed to load all student messages:', data.message);
+        }
+    } catch (error) {
+        const allMessagesContainer = document.getElementById('all-student-messages-container');
+        if (allMessagesContainer) {
+            allMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages. Please try again later.</p>
+                </div>
+            `;
+        }
+        console.error('Error loading all student messages:', error);
+    }
+}
+
+// Function to display all student messages
+function displayAllStudentMessages(messages) {
+    const allMessagesContainer = document.getElementById('all-student-messages-container');
+    
+    if (!allMessagesContainer) {
+        console.error('All student messages container not found');
+        return;
+    }
+    
+    if (!messages || messages.length === 0) {
+        allMessagesContainer.innerHTML = `
+            <div class="no-messages">
+                <i class="fas fa-inbox"></i>
+                <p>No messages found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Group messages by student and class
+    const messagesByStudentClass = {};
+    
+    messages.forEach(message => {
+        const key = `${message.student_id}_${message.class_id}`;
+        if (!messagesByStudentClass[key]) {
+            messagesByStudentClass[key] = {
+                student_id: message.student_id,
+                class_id: message.class_id,
+                student_name: message.student_name,
+                class_name: message.class_name,
+                messages: []
+            };
+        }
+        messagesByStudentClass[key].messages.push(message);
+    });
+    
+    let messagesHTML = '';
+    
+    // Create HTML for each student conversation
+    Object.values(messagesByStudentClass).forEach(conversation => {
+        // Sort messages by date (newest first)
+        conversation.messages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        // Get the most recent message
+        const latestMessage = conversation.messages[0];
+        const studentInitial = conversation.student_name.charAt(0).toUpperCase();
+        const isUnread = latestMessage.sender_type === 'student' && !latestMessage.is_read;
+        const unreadClass = isUnread ? 'message-unread' : '';
+        
+        messagesHTML += `
+            <a href="javascript:void(0)" onclick="openStudentChat(${conversation.student_id}, ${conversation.class_id}, '${conversation.student_name}', '${conversation.class_name}')" 
+               class="recent-message-item ${unreadClass}">
+                <div class="recent-message-avatar">${studentInitial}</div>
+                <div class="recent-message-content">
+                    <div class="recent-message-header">
+                        <div>
+                            <span class="recent-message-sender">${conversation.student_name}</span>
+                            <span class="recent-message-class">(${conversation.class_name})</span>
+                        </div>
+                        <span class="recent-message-time">${formatTimeAgo(latestMessage.created_at)}</span>
+                    </div>
+                    <div class="recent-message-body">${latestMessage.message}</div>
+                </div>
+            </a>
+        `;
+    });
+    
+    allMessagesContainer.innerHTML = messagesHTML;
+}
+
+// Function to close all student messages modal
+function closeAllStudentMessagesModal() {
+    hideModal('allStudentMessagesModal');
+}
+
+// Function to view all parent messages
+function viewAllParentMessages() {
+    // Show the 'All Parent Messages' modal
+    showModal('allParentMessagesModal');
+    
+    // Load all parent messages
+    loadAllParentMessages();
+} 
+
+// Function to load all parent messages
+async function loadAllParentMessages() {
+    try {
+        const allParentMessagesContainer = document.getElementById('all-parent-messages-container');
+        
+        if (!allParentMessagesContainer) {
+            console.error('All parent messages container not found');
+            return;
+        }
+        
+        allParentMessagesContainer.innerHTML = `
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading all messages...</p>
+            </div>
+        `;
+        
+        const response = await fetch('get_all_teacher_parent_messages.php');
+        const data = await response.json();
+        
+        if (data.success) {
+            displayAllParentMessages(data.messages);
+        } else {
+            allParentMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages: ${data.message}</p>
+                </div>
+            `;
+            console.error('Failed to load all parent messages:', data.message);
+        }
+    } catch (error) {
+        const allParentMessagesContainer = document.getElementById('all-parent-messages-container');
+        if (allParentMessagesContainer) {
+            allParentMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages. Please try again later.</p>
+                </div>
+            `;
+        }
+        console.error('Error loading all parent messages:', error);
+    }
+}
+
+// Function to display all parent messages
+function displayAllParentMessages(messages) {
+    const allParentMessagesContainer = document.getElementById('all-parent-messages-container');
+    
+    if (!allParentMessagesContainer) {
+        console.error('All parent messages container not found');
+        return;
+    }
+    
+    if (!messages || messages.length === 0) {
+        allParentMessagesContainer.innerHTML = `
+            <div class="no-messages">
+                <i class="fas fa-inbox"></i>
+                <p>No parent messages found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Group messages by parent and class
+    const messagesByParentClass = {};
+    
+    messages.forEach(message => {
+        const key = `${message.parent_id}_${message.class_id}`;
+        if (!messagesByParentClass[key]) {
+            messagesByParentClass[key] = {
+                parent_id: message.parent_id,
+                class_id: message.class_id,
+                parent_full_name: message.parent_full_name,
+                class_name: message.class_name,
+                children_info: message.children_info,
+                messages: []
+            };
+        }
+        messagesByParentClass[key].messages.push(message);
+    });
+    
+    let messagesHTML = '';
+    
+    // Create HTML for each parent conversation
+    Object.values(messagesByParentClass).forEach(conversation => {
+        // Sort messages by date (newest first)
+        conversation.messages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        
+        // Get the most recent message
+        const latestMessage = conversation.messages[0];
+        const parentInitial = conversation.parent_full_name.charAt(0).toUpperCase();
+        const isUnread = latestMessage.sender_type === 'parent' && !latestMessage.is_read;
+        const unreadClass = isUnread ? 'message-unread' : '';
+        
+        // Count unread messages in this conversation
+        const unreadCount = conversation.messages.filter(msg => 
+            msg.sender_type === 'parent' && !msg.is_read).length;
+        
+        // Format children info
+        const childrenInfoDisplay = conversation.children_info 
+            ? `<div class="recent-message-children-info">Parent of: ${conversation.children_info}</div>` 
+            : '';
+        
+        messagesHTML += `
+            <a href="javascript:void(0)" onclick="openParentChat(${conversation.parent_id}, ${conversation.class_id}, '${conversation.parent_full_name}', '${conversation.class_name}')" 
+               class="recent-message-item ${unreadClass}">
+                <div class="recent-message-avatar" ${isUnread ? '' : 'style="background-color: #9b59b6;"'}>${parentInitial}</div>
+                <div class="recent-message-content">
+                    <div class="recent-message-header">
+                        <div>
+                            <span class="recent-message-sender">${conversation.parent_full_name}</span>
+                            <span class="recent-message-class">(${conversation.class_name})</span>
+                            ${unreadCount > 0 ? `<span class="recent-message-unread-badge">${unreadCount}</span>` : ''}
+                        </div>
+                        <span class="recent-message-time">${formatTimeAgo(latestMessage.created_at)}</span>
+                    </div>
+                    ${childrenInfoDisplay}
+                    <div class="recent-message-body">${latestMessage.message}</div>
+                </div>
+            </a>
+        `;
+    });
+    
+    allParentMessagesContainer.innerHTML = messagesHTML;
+}
+
+// Function to close all parent messages modal
+function closeAllParentMessagesModal() {
+    hideModal('allParentMessagesModal');
+}
+
+// Function to load recent parent messages
+async function loadRecentParentMessages() {
+    try {
+        console.log('Loading parent messages...');
+        const parentMessagesContainer = document.getElementById('recent-parent-messages-container');
+        
+        if (!parentMessagesContainer) {
+            console.error('Parent messages container not found in the DOM');
+            return;
+        }
+        
+        console.log('Parent messages container found, setting loading state');
+        parentMessagesContainer.innerHTML = `
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading recent messages...</p>
+            </div>
+        `;
+        
+        console.log('Fetching from get_teacher_recent_parent_messages.php');
+        const response = await fetch('get_teacher_recent_parent_messages.php');
+        const data = await response.json();
+        console.log('Response received:', data);
+        
+        if (data.success) {
+            console.log('Success! Displaying messages:', data.messages.length);
+            displayRecentParentMessages(data.messages, data.unread_counts);
+        } else {
+            console.error('API returned error:', data.message);
+            parentMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages: ${data.message}</p>
+                </div>
+            `;
+            console.error('Failed to load recent parent messages:', data.message);
+        }
+    } catch (error) {
+        console.error('Exception caught in loadRecentParentMessages:', error);
+        const parentMessagesContainer = document.getElementById('recent-parent-messages-container');
+        if (parentMessagesContainer) {
+            parentMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages. Please try again later.</p>
+                </div>
+            `;
+        }
+        console.error('Error loading recent parent messages:', error);
+    }
+}
+
+// Function to display recent parent messages
+function displayRecentParentMessages(messages, unreadCounts) {
+    console.log('displayRecentParentMessages called with:', { 
+        messagesCount: messages ? messages.length : 0, 
+        unreadCounts: unreadCounts 
+    });
+    
+    const parentMessagesContainer = document.getElementById('recent-parent-messages-container');
+    
+    if (!parentMessagesContainer) {
+        console.error('Parent messages container not found in displayRecentParentMessages');
+        return;
+    }
+    
+    console.log('Container found, checking messages');
+    
+    if (!messages || messages.length === 0) {
+        console.log('No messages to display');
+        parentMessagesContainer.innerHTML = `
+            <div class="no-messages">
+                <i class="fas fa-inbox"></i>
+                <p>No parent messages yet</p>
+            </div>
+        `;
+        return;
+    }
+    
+    console.log('Building message HTML for', messages.length, 'messages');
+    let messagesHTML = '';
+    
+    messages.forEach((message, index) => {
+        console.log(`Processing message ${index}:`, message);
+        
+        if (!message.parent_full_name) {
+            console.warn('Message missing parent_full_name:', message);
+            return;
+        }
+        
+        const parentInitial = message.parent_full_name.charAt(0).toUpperCase();
+        const key = `${message.parent_id}_${message.class_id}`;
+        const unreadCount = unreadCounts[key] || 0;
+        const isUnread = message.sender_type === 'parent' && !message.is_read;
+        const unreadClass = isUnread ? 'message-unread' : '';
+        
+        // Format children info
+        const childrenInfoDisplay = message.children_info 
+            ? `<div class="recent-message-children-info">Parent of: ${message.children_info}</div>` 
+            : '';
+        
+        messagesHTML += `
+            <a href="javascript:void(0)" onclick="openParentChat(${message.parent_id}, ${message.class_id}, '${message.parent_full_name}', '${message.class_name}')" 
+               class="recent-message-item ${unreadClass}">
+                <div class="recent-message-avatar" ${isUnread ? '' : 'style="background-color: #9b59b6;"'}>${parentInitial}</div>
+                <div class="recent-message-content">
+                    <div class="recent-message-header">
+                        <div>
+                            <span class="recent-message-sender">${message.parent_full_name}</span>
+                            <span class="recent-message-class">(${message.class_name})</span>
+                            ${unreadCount > 0 ? `<span class="recent-message-unread-badge">${unreadCount}</span>` : ''}
+                        </div>
+                        <span class="recent-message-time">${message.formatted_time || formatTimeAgo(message.created_at)}</span>
+                    </div>
+                    ${childrenInfoDisplay}
+                    <div class="recent-message-body">${message.message}</div>
+                </div>
+            </a>
+        `;
+    });
+    
+    console.log('Setting innerHTML with message HTML');
+    parentMessagesContainer.innerHTML = messagesHTML;
+    console.log('Messages displayed');
+}
+
+// Function to open parent chat
+function openParentChat(parentId, classId, parentName, className) {
+    // Update chat modal with parent details
+    document.getElementById('chatParentName').textContent = parentName;
+    document.getElementById('chatClassName').textContent = className;
+    
+    // Store current parent and class ID in the modal for reference
+    const chatModal = document.getElementById('parentChatModal');
+    chatModal.dataset.parentId = parentId;
+    chatModal.dataset.classId = classId;
+    
+    // Clear any previous messages and show loading state
+    const chatMessagesContainer = document.getElementById('parent-chat-messages-container');
+    chatMessagesContainer.innerHTML = `
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading messages...</p>
+        </div>
+    `;
+    
+    // Load chat messages
+    loadTeacherParentMessages(parentId, classId);
+    
+    // Set up event listener for sending messages if not already set
+    const sendButton = document.getElementById('send-parent-message-btn');
+    const messageInput = document.getElementById('parent-message-input');
+    
+    // Remove any existing event listeners to prevent duplicates
+    sendButton.replaceWith(sendButton.cloneNode(true));
+    messageInput.replaceWith(messageInput.cloneNode(true));
+    
+    // Get the new references after replacement
+    const newSendButton = document.getElementById('send-parent-message-btn');
+    const newMessageInput = document.getElementById('parent-message-input');
+    
+    // Add event listeners to the new elements
+    newSendButton.addEventListener('click', () => {
+        sendTeacherMessageToParent(parentId, classId);
+    });
+    
+    newMessageInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendTeacherMessageToParent(parentId, classId);
+        }
+    });
+    
+    // Show the modal
+    showModal('parentChatModal');
+
+    // Mark messages as read
+    markParentMessagesAsRead(parentId, classId);
+}
+
+// Function to close parent chat modal
+function closeParentChatModal() {
+    hideModal('parentChatModal');
+}
+
+// Function to load teacher-parent messages
+async function loadTeacherParentMessages(parentId, classId) {
+    try {
+        const response = await fetch(`get_teacher_parent_messages.php?parent_id=${parentId}&class_id=${classId}`);
+        const data = await response.json();
+        
+        const chatMessagesContainer = document.getElementById('parent-chat-messages-container');
+        
+        if (data.success) {
+            // Group messages by date
+            const messagesByDate = {};
+            
+            data.messages.forEach(message => {
+                const messageDate = new Date(message.created_at);
+                const formattedDate = messageDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                
+                if (!messagesByDate[formattedDate]) {
+                    messagesByDate[formattedDate] = [];
+                }
+                
+                const formattedTime = messageDate.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                
+                messagesByDate[formattedDate].push({
+                    ...message,
+                    formatted_time: formattedTime
+                });
+            });
+            
+            // Create HTML for messages
+            let messagesHTML = '';
+            
+            for (const date in messagesByDate) {
+                messagesHTML += `<div class="chat-date-separator">${date}</div>`;
+                
+                messagesByDate[date].forEach(message => {
+                    const isTeacher = message.sender_type === 'teacher';
+                    const messageClass = isTeacher ? 'sent' : 'received';
+                    
+                    messagesHTML += `
+                        <div class="chat-message ${messageClass}">
+                            <div class="message-bubble">
+                                <div class="message-text">${message.message}</div>
+                                <div class="message-time">${message.formatted_time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (messagesHTML === '') {
+                messagesHTML = `
+                    <div class="no-messages">
+                        <p>No messages yet. Start the conversation!</p>
+                    </div>
+                `;
+            }
+            
+            chatMessagesContainer.innerHTML = messagesHTML;
+            
+            // Scroll to the bottom of the messages
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            
+            // Refresh recent messages after viewing - this will update read status
+            setTimeout(loadRecentParentMessages, 1000);
+            
+        } else {
+            chatMessagesContainer.innerHTML = `
+                <div class="no-messages">
+                    <p>Error loading messages: ${data.message}</p>
+                </div>
+            `;
+            console.error('Failed to load messages:', data.message);
+        }
+    } catch (error) {
+        const chatMessagesContainer = document.getElementById('parent-chat-messages-container');
+        chatMessagesContainer.innerHTML = `
+            <div class="no-messages">
+                <p>Error loading messages. Please try again later.</p>
+            </div>
+        `;
+        console.error('Error loading messages:', error);
+    }
+}
+
+// Function to mark parent messages as read
+function markParentMessagesAsRead(parentId, classId) {
+    fetch('mark_parent_messages_read.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            parent_id: parentId,
+            class_id: classId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Messages marked as read:', data.updated_rows);
+        } else {
+            console.error('Failed to mark messages as read:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error marking messages as read:', error);
+    });
+}
+
+// Function to send a message to a parent
+async function sendTeacherMessageToParent(parentId, classId) {
+    const messageInput = document.getElementById('parent-message-input');
+    const message = messageInput.value.trim();
+    
+    if (!message) {
+        return;
+    }
+    
+    try {
+        // Clear the input field immediately for better UX
+        messageInput.value = '';
+        
+        // Optimistically add the message to the UI
+        const chatMessagesContainer = document.getElementById('parent-chat-messages-container');
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        
+        // Check if we need to add a new date separator
+        const today = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const lastDateSeparator = chatMessagesContainer.querySelector('.chat-date-separator:last-of-type');
+        
+        if (!lastDateSeparator || lastDateSeparator.textContent !== today) {
+            const dateSeparator = document.createElement('div');
+            dateSeparator.className = 'chat-date-separator';
+            dateSeparator.textContent = today;
+            chatMessagesContainer.appendChild(dateSeparator);
+        }
+        
+        const messageElement = document.createElement('div');
+        messageElement.className = 'chat-message sent';
+        messageElement.innerHTML = `
+            <div class="message-bubble">
+                <div class="message-text">${message}</div>
+                <div class="message-time">${formattedTime}</div>
+            </div>
+        `;
+        
+        chatMessagesContainer.appendChild(messageElement);
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        
+        // Send the message to the server
+        const response = await fetch('send_teacher_parent_message.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                parent_id: parentId,
+                class_id: classId,
+                message: message
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            console.error('Failed to send message:', data.message);
+            showNotification(`Error sending message: ${data.message}`, 'error');
+            
+            // Remove the optimistically added message
+            messageElement.remove();
+            showNotification('Failed to send message. Please try again.', 'error');
+        } else {
+            // Refresh the recent messages in the dashboard after sending
+            setTimeout(loadRecentParentMessages, 1000);
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        showNotification('Error sending message. Please try again.', 'error');
+    }
+} 
+
+// Function to add announcement
+function addAnnouncement() {
+    // Get the current class ID from the data attribute
+    const classId = document.querySelector('#viewClassModal').dataset.classId;
+    if (!classId) {
+        showNotification('No class selected', 'error');
+        return;
+    }
+    
+    // Clear the form
+    document.getElementById('addAnnouncementForm').reset();
+    
+    // Set the class ID as a data attribute on the modal
+    document.getElementById('addAnnouncementModal').dataset.classId = classId;
+    
+    // Show the modal
+    showModal('addAnnouncementModal');
+    
+    // Add submit event listener if not already added
+    const form = document.getElementById('addAnnouncementForm');
+    
+    // Remove any existing event listeners to prevent duplicates
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    // Add event listener to the new form
+    newForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitAnnouncement();
+    });
+}
+
+// Function to close add announcement modal
+function closeAddAnnouncementModal() {
+    hideModal('addAnnouncementModal');
+}
+
+// Function to submit a new announcement
+async function submitAnnouncement() {
+    try {
+        const modal = document.getElementById('addAnnouncementModal');
+        const classId = modal.dataset.classId;
+        
+        const title = document.getElementById('announcementTitle').value.trim();
+        const content = document.getElementById('announcementContent').value.trim();
+        const visibility = document.getElementById('announcementVisibility').value;
+        const priority = document.getElementById('announcementPriority').value;
+        
+        if (!title || !content) {
+            showNotification('Please fill in all required fields', 'error');
+            return;
+        }
+        
+        // Disable the submit button and show loading state
+        const submitButton = document.querySelector('#addAnnouncementForm .btn-primary');
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+        submitButton.disabled = true;
+        
+        // Create announcement data
+        const announcementData = {
+            class_id: classId,
+            title: title,
+            content: content,
+            visibility: visibility,
+            priority: priority
+        };
+        
+        // In a real implementation, this would send data to the server
+        // Since this is a frontend-only change for now, we'll just simulate success
+        
+        // Simulate API call with a timeout
+        setTimeout(() => {
+            // Reset button state
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+            
+            // Close the modal
+            closeAddAnnouncementModal();
+            
+            // Show success notification
+            showNotification('Announcement posted successfully!', 'success');
+            
+            console.log('Announcement data (would be sent to server):', announcementData);
+        }, 1000);
+        
+        /* 
+        // This would be the actual API call in a real implementation
+        const response = await fetch('post_announcement.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(announcementData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Reset button state
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+            
+            // Close the modal
+            closeAddAnnouncementModal();
+            
+            // Show success notification
+            showNotification('Announcement posted successfully!', 'success');
+        } else {
+            throw new Error(data.message || 'Failed to post announcement');
+        }
+        */
+        
+    } catch (error) {
+        console.error('Error posting announcement:', error);
+        showNotification(`Error posting announcement: ${error.message}`, 'error');
+        
+        // Reset button state
+        const submitButton = document.querySelector('#addAnnouncementForm .btn-primary');
+        submitButton.innerHTML = 'Post Announcement';
+        submitButton.disabled = false;
+    }
+}
+
+// Function to add a new link input field
+function addLinkField() {
+    const linksContainer = document.getElementById('assessmentLinksContainer');
+    const newRow = document.createElement('div');
+    newRow.className = 'link-input-row';
+    newRow.innerHTML = `
+        <div class="input-wrapper">
+            <i class="fas fa-link"></i>
+            <input type="text" class="link-title-input" placeholder="Link Title (e.g. 'Study Guide')">
+        </div>
+        <div class="input-wrapper">
+            <i class="fas fa-globe"></i>
+            <input type="url" class="link-url-input" placeholder="https://example.com/resource">
+        </div>
+        <button type="button" class="btn-remove-link" onclick="removeLinkField(this)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    linksContainer.appendChild(newRow);
+}
+
+// Function to remove a link input field
+function removeLinkField(button) {
+    const row = button.closest('.link-input-row');
+    row.remove();
+}
+
+// Function to collect all links from the form
+function collectLinks() {
+    const links = [];
+    const linkRows = document.querySelectorAll('#assessmentLinksContainer .link-input-row');
+    
+    linkRows.forEach(row => {
+        const titleInput = row.querySelector('.link-title-input');
+        const urlInput = row.querySelector('.link-url-input');
+        
+        const title = titleInput.value.trim();
+        const url = urlInput.value.trim();
+        
+        if (title && url) {
+            links.push({ title, url });
+        }
+    });
+    
+    return links;
+}
+
+// Function to display links in the assessment form
+function updateLinksList() {
+    const links = collectLinks();
+    const linksList = document.getElementById('assessmentLinksList');
+    
+    if (links.length === 0) {
+        linksList.innerHTML = '';
+        return;
+    }
+    
+    linksList.innerHTML = links.map(link => `
+        <div class="link-item">
+            <i class="fas fa-link"></i>
+            <span class="link-title">${link.title}:</span>
+            <span class="link-url">${link.url}</span>
+        </div>
+    `).join('');
+}
+
+// Add event listeners to update links list when inputs change
+document.addEventListener('DOMContentLoaded', function() {
+    const addAssessmentForm = document.getElementById('addAssessmentForm');
+    
+    if (addAssessmentForm) {
+        addAssessmentForm.addEventListener('input', function(e) {
+            if (e.target.classList.contains('link-title-input') || e.target.classList.contains('link-url-input')) {
+                updateLinksList();
+            }
+        });
+    }
+});
+
+// Function to close add assessment modal
+function closeAddAssessmentModal() {
+    hideModal('addAssessmentModal');
+    document.getElementById('addAssessmentForm').reset();
+    document.getElementById('assessmentFileList').innerHTML = '';
+    
+    // Clear link inputs
+    const linksContainer = document.getElementById('assessmentLinksContainer');
+    if (linksContainer) {
+        // Keep only the first row and clear its inputs
+        const firstRow = linksContainer.querySelector('.link-input-row');
+        if (firstRow) {
+            const titleInput = firstRow.querySelector('.link-title-input');
+            const urlInput = firstRow.querySelector('.link-url-input');
+            if (titleInput) titleInput.value = '';
+            if (urlInput) urlInput.value = '';
+        }
+        
+        // Remove any additional rows
+        const additionalRows = linksContainer.querySelectorAll('.link-input-row:not(:first-child)');
+        additionalRows.forEach(row => row.remove());
+    }
+    
+    // Clear links list
+    const linksList = document.getElementById('assessmentLinksList');
+    if (linksList) {
+        linksList.innerHTML = '';
+    }
+} 
+
+// Export Assessment Scores
+function exportAssessmentScores() {
+    // Get the current class ID from the modal
+    const classId = document.getElementById('classDetailsModal').getAttribute('data-class-id');
+    
+    if (!classId) {
+        showNotification('Error: Class information not found', 'error');
+        return;
+    }
+    
+    // Create the URL with the class ID parameter
+    const exportUrl = `export_assessment_scores.php?class_id=${classId}`;
+    
+    // Open in new tab
+    window.open(exportUrl, '_blank');
+}

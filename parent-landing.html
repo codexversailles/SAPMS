@@ -1,1 +1,245 @@
- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub - Parent Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Enhanced parent landing page styles */
+        .hero {
+            background-image: url('https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(41, 128, 185, 0.85));
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 2.5rem;
+            border-radius: 10px;
+            background-color: rgba(44, 62, 80, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hero h1 {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.5rem;
+            font-size: 3.2rem;
+        }
+        
+        .hero p {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2.5rem;
+            font-size: 1.3rem;
+            line-height: 1.8;
+        }
+        
+        .cta-button {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cta-button:active {
+            transform: translateY(1px);
+        }
+        
+        .about {
+            padding: 5rem 5%;
+        }
+        
+        .about h2 {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 3.5rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        .about h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--secondary-color), transparent);
+            border-radius: 2px;
+        }
+        
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: linear-gradient(180deg, rgba(52, 152, 219, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+            transition: height 0.3s ease;
+            z-index: 0;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card:hover::before {
+            height: 100%;
+        }
+        
+        .card i, .card h3, .card p {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card i {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SAP-MS</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to the Parent Portal</h1>
+            <p>Stay connected with your child's educational journey and engage with teachers effectively. Access real-time updates, communicate directly, and support your child's learning success.</p>
+            <button class="cta-button" onclick="location.href='parent-auth.html'">Sign In / Register</button>
+        </div>
+    </section>
+
+    <section id="features" class="about">
+        <h2>Parent Portal Features</h2>
+        <div class="cards-container">
+            <div class="card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Track Progress</h3>
+                <p>Monitor your child's academic progress in real-time with detailed performance analytics and attendance records. Access grades, assessment results, and teacher feedback to stay informed.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-comments"></i>
+                <h3>Communication</h3>
+                <p>Easily communicate with teachers through our secure messaging system for updates, concerns, or scheduling parent-teacher meetings. Receive timely notifications about important announcements.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="about">
+        <h2>How It Works</h2>
+        <div class="cards-container">
+            <div class="card">
+                <i class="fas fa-user-plus"></i>
+                <h3>Step 1: Create Your Account</h3>
+                <p>Register using your email and create a secure password to access the parent portal. Verify your account through the confirmation link sent to your email.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-link"></i>
+                <h3>Step 2: Link to Your Child</h3>
+                <p>Connect your account to your child's profile using the verification code provided by their school. This secure process ensures only authorized parents have access.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-laptop"></i>
+                <h3>Step 3: Access Dashboard</h3>
+                <p>Gain instant access to your personalized dashboard with all the information you need about your child's education. Navigate through intuitive sections for different features.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="about">
+        <h2>Need Help?</h2>
+        <div class="cards-container">
+            <div class="card">
+                <i class="fas fa-question-circle"></i>
+                <h3>Support</h3>
+                <p>Our support team is always ready to assist you with any questions or technical issues. We're committed to ensuring your experience with the parent portal is smooth and effective.</p>
+                <button class="cta-button" style="margin-top: 1.5rem;" onclick="location.href='support.html'">Contact Support</button>
+            </div>
+            <div class="card">
+                <i class="fas fa-book"></i>
+                <h3>Resources</h3>
+                <p>Access our comprehensive guides and FAQs to learn more about using the parent portal effectively. Find answers to common questions and explore all available features.</p>
+                <button class="cta-button" style="margin-top: 1.5rem;" onclick="location.href='parent-resources.html'">View Resources</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+            this.classList.toggle('active');
+        });
+        
+        // Add smooth scrolling for navigation links
+        document.querySelectorAll('.nav-links a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = href;
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 70,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

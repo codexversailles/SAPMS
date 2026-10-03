@@ -36,31 +36,27 @@ if (!isset($_FILES['submission_file']) || $_FILES['submission_file']['error'] !=
 
 try {
     // Start transaction
-    $conn->begin_transaction();
+    $pdo->beginTransaction();
     
     // Check if student already has a submission for this assessment
     $check_query = "SELECT id FROM student_submissions WHERE student_id = ? AND assessment_id = ?";
-    $check_stmt = $conn->prepare($check_query);
-    $check_stmt->bind_param("ii", $student_id, $assessment_id);
-    $check_stmt->execute();
-    $result = $check_stmt->get_result();
+    $check_stmt = $pdo->prepare($check_query);
+    $check_stmt->execute([$student_id, $assessment_id]);
+    $submission = $check_stmt->fetch(PDO::FETCH_ASSOC);
     
-    if ($result->num_rows > 0) {
+    if ($submission) {
         // Update existing submission
-        $submission = $result->fetch_assoc();
         $submission_id = $submission['id'];
         
         $update_query = "UPDATE student_submissions SET submission_date = NOW() WHERE id = ?";
-        $update_stmt = $conn->prepare($update_query);
-        $update_stmt->bind_param("i", $submission_id);
-        $update_stmt->execute();
+        $update_stmt = $pdo->prepare($update_query);
+        $update_stmt->execute([$submission_id]);
     } else {
         // Create new submission
         $insert_query = "INSERT INTO student_submissions (assessment_id, student_id, submission_date) VALUES (?, ?, NOW())";
-        $insert_stmt = $conn->prepare($insert_query);
-        $insert_stmt->bind_param("ii", $assessment_id, $student_id);
-        $insert_stmt->execute();
-        $submission_id = $conn->insert_id;
+        $insert_stmt = $pdo->prepare($insert_query);
+        $insert_stmt->execute([$assessment_id, $student_id]);
+        $submission_id = $pdo->lastInsertId();
     }
     
     // Handle file upload
@@ -85,12 +81,11 @@ try {
         // Insert file record
         $file_query = "INSERT INTO submission_files (submission_id, file_name, file_path, file_type, file_size) 
                       VALUES (?, ?, ?, ?, ?)";
-        $file_stmt = $conn->prepare($file_query);
-        $file_stmt->bind_param("isssi", $submission_id, $file_name, $file_path, $file_type, $file_size);
-        $file_stmt->execute();
+        $file_stmt = $pdo->prepare($file_query);
+        $file_stmt->execute([$submission_id, $file_name, $file_path, $file_type, $file_size]);
         
         // Commit transaction
-        $conn->commit();
+        $pdo->commit();
         
         echo json_encode([
             'success' => true,
@@ -103,7 +98,9 @@ try {
     
 } catch (Exception $e) {
     // Rollback transaction on error
-    $conn->rollback();
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     
     echo json_encode([
         'success' => false,

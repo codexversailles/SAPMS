@@ -55,3 +55,151 @@ Session data: Array
 
 Processing with: class_name=Sup Nigga, class_code=FP2XW4, teacher_id=8
 Class created successfully with ID: 9
+Request received at: 2025-05-13 14:23:47
+Raw request data: {"class_name":"Rizal","class_code":"SMDJH1"}
+Decoded data: Array
+(
+    [class_name] => Rizal
+    [class_code] => SMDJH1
+)
+
+Session data: Array
+(
+    [student_id] => 32
+    [teacher_id] => 8
+    [teacher_name] => lance
+)
+
+Processing with: class_name=Rizal, class_code=SMDJH1, teacher_id=8
+Class created successfully with ID: 10
+Request received at: 2025-05-13 14:23:54
+Raw request data: {"class_name":"TAE","class_code":"VQ38D9"}
+Decoded data: Array
+(
+    [class_name] => TAE
+    [class_code] => VQ38D9
+)
+
+Session data: Array
+(
+    [student_id] => 32
+    [teacher_id] => 8
+    [teacher_name] => lance
+)
+
+Processing with: class_name=TAE, class_code=VQ38D9, teacher_id=8
+Class created successfully with ID: 11
+Request received at: 2025-05-14 23:57:00
+Raw request data: {"class_name":"Wow","class_code":"OARJ65"}
+Decoded data: Array
+(
+    [class_name] => Wow
+    [class_code] => OARJ65
+)
+
+Session data: Array
+(
+    [student_id] => 32
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+)
+
+Processing with: class_name=Wow, class_code=OARJ65, teacher_id=8
+Class created successfully with ID: 12
+Request received at: 2025-05-15 00:09:30
+Raw request data: {"class_name":"Test","class_code":"GQG0H9"}
+Decoded data: Array
+(
+    [class_name] => Test
+    [class_code] => GQG0H9
+)
+
+Session data: Array
+(
+    [student_id] => 32
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+)
+
+Processing with: class_name=Test, class_code=GQG0H9, teacher_id=8
+Class created successfully with ID: 13
+Request received at: 2025-05-16 06:13:56
+Raw request data: {"class_name":"Information Management","class_code":"RSZ4DX"}
+Decoded data: Array
+(
+    [class_name] => Information Management
+    [class_code] => RSZ4DX
+)
+
+Session data: Array
+(
+    [student_id] => 32
+    [teacher_id] => 8
+    [teacher_name] => lance
+)
+
+Processing with: class_name=Information Management, class_code=RSZ4DX, teacher_id=8
+Class created successfully with ID: 14
+Request received at: 2025-05-16 06:14:03
+Raw request data: {"class_name":"Web Systems","class_code":"3WV19K"}
+Decoded data: Array
+(
+    [class_name] => Web Systems
+    [class_code] => 3WV19K
+)
+
+Session data: Array
+(
+    [student_id] => 32
+    [teacher_id] => 8
+    [teacher_name] => lance
+)
+
+Processing with: class_name=Web Systems, class_code=3WV19K, teacher_id=8
+Class created successfully with ID: 15
+Request received at: 2025-05-16 08:41:19
+Raw request data: {"class_name":"Networking","class_code":"H8S3PX"}
+Decoded data: Array
+(
+    [class_name] => Networking
+    [class_code] => H8S3PX
+)
+
+Session data: Array
+(
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+    [teacher_id] => 12
+    [teacher_name] => Mercy Fermo
+    [verification_email] => lanceandrefermo@gmail.com
+    [email_verified] => 1
+)
+
+Processing with: class_name=Networking, class_code=H8S3PX, teacher_id=12
+Class created successfully with ID: 16
+Request received at: 2025-05-16 08:44:18
+Raw request data: {"class_name":" Information Management 2B","class_code":"ET72CH"}
+Decoded data: Array
+(
+    [class_name] =>  Information Management 2B
+    [class_code] => ET72CH
+)
+
+Session data: Array
+(
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+    [teacher_id] => 12
+    [teacher_name] => Mercy Fermo
+    [verification_email] => lanceandrefermo@gmail.com
+    [email_verified] => 1
+)
+
+Processing with: class_name= Information Management 2B, class_code=ET72CH, teacher_id=12
+Class created successfully with ID: 17

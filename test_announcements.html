@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            margin-bottom: 30px;
+        }
+        h1, h2 {
+            color: #3498db;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: auto;
+            max-height: 400px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 200px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Announcements Test Page</h1>
+    
+    <div class="container">
+        <h2>Test 1: All Announcements</h2>
+        <button id="testAllBtn">Test All Announcements</button>
+        <div id="allAnnouncementsResult"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Test 2: Student Announcements</h2>
+        <input type="text" id="studentIdInput" placeholder="Enter Student ID" value="STU2025004">
+        <button id="testStudentBtn">Test Student Announcements</button>
+        <div id="studentAnnouncementsResult"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Test 3: Child Details API</h2>
+        <input type="text" id="childIdInput" placeholder="Enter Student ID" value="STU2025004">
+        <button id="testChildDetailsBtn">Test Child Details API</button>
+        <div id="childDetailsResult"></div>
+    </div>
+    
+    <script>
+        document.getElementById('testAllBtn').addEventListener('click', function() {
+            fetch('test_announcements.php')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('allAnnouncementsResult').innerHTML = 
+                        `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                })
+                .catch(error => {
+                    document.getElementById('allAnnouncementsResult').innerHTML = 
+                        `<p class="error">Error: ${error.message}</p>`;
+                });
+        });
+        
+        document.getElementById('testStudentBtn').addEventListener('click', function() {
+            const studentId = document.getElementById('studentIdInput').value;
+            fetch(`test_student_announcements.php?student_id=${studentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('studentAnnouncementsResult').innerHTML = 
+                        `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                })
+                .catch(error => {
+                    document.getElementById('studentAnnouncementsResult').innerHTML = 
+                        `<p class="error">Error: ${error.message}</p>`;
+                });
+        });
+        
+        document.getElementById('testChildDetailsBtn').addEventListener('click', function() {
+            const studentId = document.getElementById('childIdInput').value;
+            fetch(`get_child_details.php?student_id=${studentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('childDetailsResult').innerHTML = 
+                        `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                })
+                .catch(error => {
+                    document.getElementById('childDetailsResult').innerHTML = 
+                        `<p class="error">Error: ${error.message}</p>`;
+                });
+        });
+    </script>
+</body>
+</html> 

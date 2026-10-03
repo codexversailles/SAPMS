@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parent Authentication - SAMS</title>
+    <title>Parent Authentication - SAPMS</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,6 +57,92 @@
                 opacity: 0;
             }
         }
+        
+        /* Verification step styles */
+        .verification-step {
+            display: none;
+        }
+
+        /* Improved verification code input UI */
+        .verification-code-input {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .verification-code-input input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .verification-code-input input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+            outline: none;
+            transform: translateY(-2px);
+        }
+
+        .verification-code-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .verification-code-container p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .resend-code {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .resend-code a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .resend-code a:hover {
+            background-color: #f0f0f0;
+            text-decoration: none;
+        }
+
+        .timer {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-left: 5px;
+        }
+        
+        .verification-title {
+            color: #3498db;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .verification-icon {
+            font-size: 40px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -64,8 +150,8 @@
     <nav class="navbar">
         <div class="logo">SAP-MS</div>
         <ul class="nav-links">
-            <li><a href="index.html#students">Students</a></li>
-            <li><a href="index.html#teachers">Teachers</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="parent-landing.html">Parent Portal</a></li>
         </ul>
         <div class="hamburger">
             <span></span>
@@ -114,6 +200,8 @@
                     <p>Create your parent account to get started.</p>
                 </div>
                 <form class="registration-form" onsubmit="return handleRegister(event)">
+                    <!-- Step 1: Basic Information -->
+                    <div class="register-step-1">
                     <div class="form-group">
                         <label for="fullName">Parent's Full Name</label>
                         <input type="text" id="fullName" required placeholder="Enter your full name">
@@ -150,7 +238,34 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                    <button type="submit" class="submit-button">Register</button>
+                        <button type="button" class="submit-button" id="register-step-1-btn">Continue</button>
+                    </div>
+                    
+                    <!-- Step 2: Verification Code -->
+                    <div class="verification-step register-step-2">
+                        <div class="verification-code-container">
+                            <div class="verification-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <h3 class="verification-title">SAPMS Email Verification</h3>
+                            <p>We've sent a 6-digit verification code to your email.</p>
+                            <p>Please enter the code below to verify your account.</p>
+                            <div class="verification-code-input">
+                                <input type="text" maxlength="1" class="code-input" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" maxlength="1" class="code-input" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" maxlength="1" class="code-input" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" maxlength="1" class="code-input" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" maxlength="1" class="code-input" inputmode="numeric" pattern="[0-9]*">
+                                <input type="text" maxlength="1" class="code-input" inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <div class="resend-code">
+                                <span>Didn't receive the code? </span>
+                                <a href="#" id="register-resend-code">Resend</a>
+                                <span id="register-resend-timer" class="timer"></span>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-button">Create Account</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -184,12 +299,107 @@
                 registerForm.classList.add('hidden');
                 loginBtn.classList.add('active');
                 registerBtn.classList.remove('active');
+                // Reset registration form
+                resetRegisterForm();
             } else {
                 loginForm.classList.add('hidden');
                 registerForm.classList.remove('hidden');
                 loginBtn.classList.remove('active');
                 registerBtn.classList.add('active');
             }
+        }
+        
+        function resetRegisterForm() {
+            document.querySelector('.register-step-1').style.display = 'block';
+            document.querySelector('.register-step-2').style.display = 'none';
+            document.getElementById('registerForm').querySelector('form').reset();
+            clearCodeInputs(document.querySelector('.register-step-2'));
+        }
+        
+        function clearCodeInputs(container) {
+            const codeInputs = container.querySelectorAll('.code-input');
+            codeInputs.forEach(input => input.value = '');
+        }
+        
+        // Initialize verification code input fields
+        function initCodeInputs() {
+            const codeInputFields = document.querySelectorAll('.verification-code-input');
+            
+            codeInputFields.forEach(container => {
+                const inputs = container.querySelectorAll('input');
+                
+                inputs.forEach((input, index) => {
+                    // Only allow digits
+                    input.addEventListener('keypress', function(e) {
+                        if (!/^\d$/.test(e.key)) {
+                            e.preventDefault();
+                        }
+                    });
+                    
+                    // Focus next input when a digit is entered
+                    input.addEventListener('input', function() {
+                        if (this.value.length === this.maxLength) {
+                            const next = inputs[index + 1];
+                            if (next) next.focus();
+                        }
+                    });
+                    
+                    // Handle backspace key
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Backspace' && !this.value) {
+                            const prev = inputs[index - 1];
+                            if (prev) prev.focus();
+                        }
+                    });
+                    
+                    // Handle paste event
+                    input.addEventListener('paste', function(e) {
+                        e.preventDefault();
+                        const pasteData = e.clipboardData.getData('text').trim();
+                        if (!/^\d+$/.test(pasteData)) return; // Only allow digits
+                        
+                        // Fill inputs with pasted code
+                        for (let i = 0; i < Math.min(pasteData.length, inputs.length); i++) {
+                            inputs[i].value = pasteData[i];
+                        }
+                        
+                        // Focus the last filled input or the next empty one
+                        const lastIndex = Math.min(pasteData.length, inputs.length) - 1;
+                        if (lastIndex >= 0) inputs[lastIndex].focus();
+                    });
+                });
+            });
+        }
+        
+        // Get verification code from inputs
+        function getVerificationCode(container) {
+            const inputs = container.querySelectorAll('.code-input');
+            let code = '';
+            inputs.forEach(input => {
+                code += input.value;
+            });
+            return code;
+        }
+        
+        // Start countdown timer
+        function startResendTimer(elementId, seconds, callback) {
+            const timerElement = document.getElementById(elementId);
+            let timeLeft = seconds;
+            
+            timerElement.textContent = `(${timeLeft}s)`;
+            
+            const interval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `(${timeLeft}s)`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    timerElement.textContent = '';
+                    callback();
+                }
+            }, 1000);
+            
+            return interval;
         }
 
         function handleLogin(event) {
@@ -236,14 +446,143 @@
             return false;
         }
 
-        function handleRegister(event) {
-            event.preventDefault();
+        // Handle step 1 of registration
+        document.getElementById('register-step-1-btn').addEventListener('click', function() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const childName = document.getElementById('childName').value;
+            const studentId = document.getElementById('studentId').value;
+            const relationship = document.getElementById('relationship').value;
+            
+            // Validate inputs
+            if (!fullName) {
+                showNotification('Parent\'s full name is required', 'error');
+                return;
+            }
+            
+            if (!email) {
+                showNotification('Email is required', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showNotification('Password is required', 'error');
+                return;
+            }
 
             if (password !== confirmPassword) {
                 showNotification('Passwords do not match', 'error');
-                return false;
+                return;
+            }
+            
+            if (!childName) {
+                showNotification('Student\'s full name is required', 'error');
+                return;
+            }
+            
+            if (!studentId) {
+                showNotification('Student ID is required', 'error');
+                return;
+            }
+            
+            if (!relationship) {
+                showNotification('Relationship to student is required', 'error');
+                return;
+            }
+            
+            // Send verification code
+            sendVerificationCode(email, false);
+        });
+        
+        // Function to send verification code
+        function sendVerificationCode(email, isLogin) {
+            // Disable button and show loading
+            const btn = document.getElementById('register-step-1-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+            
+            fetch('email_verification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Cache-Control': 'no-cache'
+                },
+                body: `action=send_verification_code&email=${encodeURIComponent(email)}&is_login=${isLogin}&is_parent=true`
+            })
+            .then(response => {
+                // Check if the response is valid JSON
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                } else {
+                    // If not JSON, get the text and log it for debugging
+                    return response.text().then(text => {
+                        console.error("Received non-JSON response:", text);
+                        throw new Error("Invalid response format");
+                    });
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    // Move to verification step
+                    document.querySelector('.register-step-1').style.display = 'none';
+                    document.querySelector('.register-step-2').style.display = 'block';
+                    
+                    // Start resend timer
+                    let resendBtn = document.getElementById('register-resend-code');
+                    resendBtn.style.pointerEvents = 'none';
+                    resendBtn.style.opacity = '0.5';
+                    
+                    startResendTimer('register-resend-timer', 60, function() {
+                        resendBtn.style.pointerEvents = 'auto';
+                        resendBtn.style.opacity = '1';
+                    });
+                    
+                    // Focus first input
+                    document.querySelector('.register-step-2 .code-input').focus();
+                    
+                    showNotification(data.message);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error("Error during verification code request:", error);
+                showNotification('An error occurred. Please try again.', 'error');
+            })
+            .finally(() => {
+                // Reset button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            // Check which step is visible
+            if (document.querySelector('.register-step-2').style.display === 'none') {
+                // If step 1 is visible, simulate click on the "Continue" button
+                document.getElementById('register-step-1-btn').click();
+                return;
+            }
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const childName = document.getElementById('childName').value;
+            const studentId = document.getElementById('studentId').value;
+            const relationship = document.getElementById('relationship').value;
+            const code = getVerificationCode(document.querySelector('.register-step-2'));
+
+            // Validate code
+            if (code.length !== 6) {
+                showNotification('Please enter the complete 6-digit code', 'error');
+                return;
             }
 
             // Disable the submit button and show loading state
@@ -252,28 +591,58 @@
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             submitButton.disabled = true;
 
-            const formData = new FormData();
-            formData.append('action', 'register');
-            formData.append('fullName', document.getElementById('fullName').value);
-            formData.append('email', document.getElementById('email').value);
-            formData.append('password', password);
-            formData.append('confirmPassword', confirmPassword);
-            formData.append('childName', document.getElementById('childName').value);
-            formData.append('studentId', document.getElementById('studentId').value);
-            formData.append('relationship', document.getElementById('relationship').value);
-
-            fetch('parent_auth.php', {
+            // First verify the code
+            fetch('email_verification.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Cache-Control': 'no-cache'
+                },
+                body: `action=verify_code&code=${encodeURIComponent(code)}`
             })
-            .then(response => response.json())
+            .then(response => {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        console.error("Received non-JSON response:", text);
+                        throw new Error("Invalid response format");
+                    });
+                }
+            })
             .then(data => {
                 if (data.success) {
-                    showNotification('Account created successfully! Redirecting to login...');
-                    // Clear the form
-                    event.target.reset();
-                    // Switch to login form after 2 seconds
+                    // Code verified, now register
+                    // Create FormData with the proper fields for the database
+            const formData = new FormData();
+            formData.append('action', 'register');
+                    formData.append('fullName', fullName);
+                    formData.append('email', email);
+            formData.append('password', password);
+            formData.append('confirmPassword', confirmPassword);
+                    formData.append('childName', childName);
+                    formData.append('studentId', studentId);
+                    formData.append('relationship', relationship);
+
+                    return fetch('parent_auth.php', {
+                method: 'POST',
+                body: formData
+                    }).then(response => {
+                        // For debugging: log the raw response
+                        response.clone().text().then(text => console.log('Raw response:', text));
+                        return response.json();
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('Registration successful! Please login with your new account.');
                     setTimeout(() => {
+                        // Reset and switch to login form
+                        resetRegisterForm();
                         toggleForm('login');
                     }, 2000);
                 } else {
@@ -281,8 +650,8 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred during registration', 'error');
+                console.error("Error during registration:", error);
+                showNotification(error.message || 'An error occurred. Please try again.', 'error');
             })
             .finally(() => {
                 // Reset button state
@@ -292,10 +661,23 @@
             
             return false;
         }
+        
+        // Handle resend code
+        document.getElementById('register-resend-code').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            sendVerificationCode(email, false);
+        });
 
         // Mobile menu toggle
         document.querySelector('.hamburger').addEventListener('click', function() {
             document.querySelector('.nav-links').classList.toggle('active');
+        });
+        
+        // Initialize verification code inputs when document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initCodeInputs();
         });
     </script>
 </body>

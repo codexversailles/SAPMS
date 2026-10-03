@@ -1,0 +1,44 @@
+Debug log: 2025-05-23 09:10:10
+Session data: Array
+(
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [class_id] => 1
+)
+
+GET data: Array
+(
+)
+
+Exception: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'studyhub.enrollments' doesn't exist
+#0 C:\xampp\htdocs\StudyHub1\log_class_view.php(60): PDOStatement->execute(Array)
+#1 {main}
+Debug log: 2025-05-23 09:10:55
+Session data: Array
+(
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [class_id] => 3
+)
+
+GET data: Array
+(
+)
+
+Exception: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'studyhub.enrollments' doesn't exist
+#0 C:\xampp\htdocs\StudyHub1\log_class_view.php(60): PDOStatement->execute(Array)
+#1 {main}

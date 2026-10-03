@@ -1,0 +1,392 @@
+2025-05-16 07:02:45 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php3BF7.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:47 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php41D4.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:47 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php436B.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:47 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php43E9.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:48 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php4467.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:48 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php44E5.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:48 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php4583.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:48 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php463F.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:48 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php470B.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:48 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php47B8.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:49 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php4865.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:50 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php4D67.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:50 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php4E14.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+
+2025-05-16 07:02:50 - Submission attempt
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [parent_id] => 6
+    [parent_name] => mama ni test student
+    [student_id] => 32
+)
+
+POST data: Array
+(
+    [assessment_id] => 37
+)
+
+FILES data: Array
+(
+    [submission_file] => Array
+        (
+            [name] => Rizal-Monologue-Sicalag-1.docx
+            [type] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
+            [tmp_name] => C:\xampp\tmp\php4ED1.tmp
+            [error] => 0
+            [size] => 9255
+        )
+
+)
+

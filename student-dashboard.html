@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - StudyHub</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="chat-styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -644,6 +645,11 @@
         }
 
         /* Chat styling */
+        .submitted-files {
+            margin-top: 1rem;
+        }
+        
+        /* Chat styles */
         .chat-popup {
             position: fixed;
             top: 0;
@@ -748,10 +754,6 @@
             opacity: 0.8;
         }
         
-        .message.sent .message-info {
-            text-align: right;
-        }
-        
         .chat-input-container {
             padding: 0.8rem;
             border-top: 1px solid var(--border-color);
@@ -844,78 +846,54 @@
             display: block;
         }
 
-        /* Form styles */
-        .form-group {
-            margin-bottom: 1.5rem;
+        .sender-type {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-size: 0.65rem;
+            margin-right: 5px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s;
-            outline: none;
-        }
-
-        .form-group input:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-
-        /* Animation keyframes */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 992px) {
-            .class-item {
-                flex: 0 0 calc(50% - 20px);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 1.5rem;
-            }
-
-            .welcome-section {
-                flex-direction: column;
-                text-align: center;
+        @keyframes pulseHighlight {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 10px rgba(52, 152, 219, 0.5); }
+            100% { transform: scale(1); }
         }
         
-            .user-actions {
-                justify-content: center;
+        .chat-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
             }
 
-            .class-item {
-                flex: 0 0 100%;
+        .chat-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: all 0.2s;
             }
 
-            .class-actions {
-                flex-direction: column;
+        .chat-btn i {
+            margin-right: 8px;
             }
 
-            .class-actions .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .chat-popup {
-                width: 100%;
-                right: -100%;
-        }
+        .chat-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         /* Notification Styles */
@@ -947,6 +925,11 @@
             border-left: 5px solid #c0392b;
         }
         
+        .notification.info {
+            background-color: rgba(52, 152, 219, 0.95);
+            border-left: 5px solid #2980b9;
+        }
+        
         .notification::before {
             content: "";
             position: absolute;
@@ -963,6 +946,10 @@
 
         .notification.error::before {
             color: #e74c3c;
+        }
+        
+        .notification.info::before {
+            color: #3498db;
         }
         
         @keyframes slideIn {
@@ -1320,6 +1307,640 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
+
+        /* Add styles for notifications */
+        .notification-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            position: relative;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .notifications-popup {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            width: 350px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            overflow: hidden;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .notifications-popup.active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notifications-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .notifications-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .mark-all-read {
+            color: white;
+            opacity: 0.8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: opacity 0.2s;
+        }
+        
+        .mark-all-read:hover {
+            opacity: 1;
+        }
+        
+        .notifications-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .notification-item:hover {
+            background-color: var(--light-gray);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .notification-item.unread {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .notification-item.unread:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .notification-item.unread:after {
+            content: '';
+            position: absolute;
+            top: 1rem;
+            left: 0;
+            width: 4px;
+            height: 80%;
+            background-color: var(--secondary-color);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            min-width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--primary-color);
+            font-size: 0.95rem;
+        }
+        
+        .notification-text {
+            color: var(--dark-gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .notification-time {
+            color: var(--dark-gray);
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .empty-notifications {
+            padding: 2rem;
+            text-align: center;
+            color: var(--dark-gray);
+        }
+        
+        .notifications-footer {
+            padding: 0.75rem;
+            text-align: center;
+            background-color: var(--light-gray);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .view-all-link {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        
+        .view-all-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        /* Custom CSS for chat windows positioning */
+        #teacherChatWindow {
+            right: -400px;
+        }
+        
+        #teacherChatWindow.active {
+            right: 0; /* Position in the corner of the page */
+        }
+        
+        #classChatWindow {
+            right: -400px;
+        }
+        
+        #classChatWindow.active {
+            right: 0;
+        }
+        
+        /* Ensure only one chat window is visible at a time */
+        #teacherChatWindow.active ~ #classChatWindow.active {
+            display: none;
+        }
+        
+        /* Announcements Window Styles */
+        .announcements-popup {
+            position: fixed;
+            top: 0;
+            left: -400px; 
+            width: 350px;
+            height: 100vh; /* Use viewport height to ensure full height */
+            max-height: 100vh;
+            background-color: white;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.2);
+            z-index: 1100;
+            transition: left 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            border-radius: 0;
+            overflow: hidden;
+        }
+        
+        /* Increase width for better usability */
+        @media (min-width: 576px) {
+            .announcements-popup {
+                width: 400px;
+                left: -400px;
+            }
+        }
+        
+        .announcements-popup.active {
+            left: 0; /* Slide in from the left */
+        }
+        
+        .announcements-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-height: 60px;
+            z-index: 1;
+        }
+        
+        .announcements-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .announcements-header h3 i {
+            margin-right: 0.5rem;
+        }
+        
+        .close-announcements {
+            background: none;
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .close-announcements:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .announcements-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem;
+            background-color: #f5f7fa;
+            width: 100%;
+            height: calc(100% - 60px);
+            max-height: calc(100vh - 60px);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .announcements-loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--dark-gray);
+            font-size: 1rem;
+        }
+        
+        .announcements-loading i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .announcement-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 3px solid var(--secondary-color);
+            transition: transform 0.2s;
+            overflow: visible;  /* Change from hidden to visible */
+            height: auto;       /* Ensure height adapts to content */
+            max-width: 100%;    /* Ensure doesn't exceed container width */
+            display: flex;
+            flex-direction: column;
+            word-break: break-word;
+        }
+        
+        .announcement-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .announcement-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            padding-right: 10px;
+            line-height: 1.4;
+        }
+        
+        .announcement-date {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .announcement-date i {
+            margin-right: 5px;
+        }
+        
+        .announcement-content {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        
+        .empty-announcements {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Ensure modals are displayed properly */
+        .modal.active {
+            display: flex !important;
+        }
+
+        /* Add Announcement Modal Styles */
+        #addAnnouncementModal .form-group {
+            margin-bottom: 15px; /* Slightly reduced margin for a more compact form */
+        }
+
+        /* Add styles for announcement priorities */
+        .priority-urgent {
+            border-left-color: #e74c3c !important;
+        }
+        
+        .priority-urgent .announcement-title {
+            color: #e74c3c;
+        }
+        
+        .priority-important {
+            border-left-color: #f39c12 !important;
+        }
+        
+        .priority-important .announcement-title {
+            color: #f39c12;
+        }
+        
+        .announcement-files {
+            position: relative;
+            z-index: 5; /* Ensure files display above other content */
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            width: 100%;            
+            box-sizing: border-box;
+            overflow: visible; /* Allow content to be visible outside container */
+        }
+        
+        .announcement-files .file-item {
+            position: relative; /* Needed for proper z-index behavior */
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            flex-wrap: wrap;       
+            width: 100%;           
+            box-sizing: border-box;
+            z-index: 10; /* Higher than parent to ensure visibility */
+            overflow: visible; /* Allow content to overflow */
+        }
+        
+        .announcement-files .file-name {
+            flex: 1;
+            margin: 0 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 100px;     /* Ensure there's always space */
+        }
+        
+        .announcement-files .file-size {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-right: 15px;
+        }
+        
+        .announcement-files .file-download {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;   /* Keep download text on one line */
+            margin-top: 5px;       /* Add some space if it wraps */
+            margin-bottom: 5px;
+            z-index: 15; /* Even higher z-index */
+            position: relative; /* Better stacking context */
+            margin-left: auto; /* Push to right side */
+        }
+        
+        .announcement-files .file-download i {
+            margin-right: 5px;
+        }
+        
+        /* Responsive adjustments for small screens */
+        @media (max-width: 480px) {
+            .announcement-files .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .announcement-files .file-name {
+                margin-bottom: 5px;
+                width: 100%;
+            }
+            
+            .announcement-files .file-download {
+                align-self: flex-end;
+            }
+        }
+
+        /* Assessment link styles */
+        .assessment-links {
+            margin-bottom: 20px;
+            margin-top: 15px;
+        }
+
+        .assessment-links .link-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0; /* Ensures text-overflow works properly */
+        }
+
+        .assessment-links .link-item {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%);
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.25s ease;
+            border-left: 4px solid #3498db;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .assessment-links .link-item::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #3498db;
+            top: 50%;
+            left: -6px;
+            transform: translateY(-50%);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .assessment-links .link-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.15);
+            background: linear-gradient(135deg, #e6f2ff 0%, #d9edff 100%);
+        }
+
+        .assessment-links .link-item i.fa-external-link-alt {
+            background-color: rgba(52, 152, 219, 0.15);
+            color: #2980b9;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-right: 12px;
+            transition: all 0.2s;
+        }
+
+        .assessment-links .link-item:hover i.fa-external-link-alt {
+            background-color: rgba(52, 152, 219, 0.25);
+            transform: scale(1.1);
+        }
+
+        .assessment-links .link-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-right: 15px;
+            font-size: 1.05em;
+            letter-spacing: 0.2px;
+            transition: color 0.2s;
+            padding-bottom: 2px;
+            border-bottom: 2px solid transparent;
+            line-height: 1.3;
+        }
+
+        .assessment-links .link-item:hover .link-title {
+            color: #1a5276;
+            border-bottom-color: rgba(52, 152, 219, 0.4);
+        }
+
+        .assessment-links .link-url {
+            color: #7f8c8d;
+            font-size: 0.87em;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 3px 0;
+            transition: all 0.2s;
+            margin-top: 2px;
+            display: inline-block;
+        }
+
+        .assessment-links .link-url:hover {
+            color: #3498db;
+            text-decoration: underline;
+        }
+
+        .assessment-links .link-open-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            margin-left: 15px;
+            font-size: 0.9em;
+            text-decoration: none;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(41, 128, 185, 0.3);
+        }
+
+        .assessment-links .link-open-btn:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #216896 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(41, 128, 185, 0.4);
+        }
+
+        .assessment-links .link-open-btn i {
+            font-size: 0.9em;
+            color: white !important;
+            margin: 0;
+        }
+
+        /* Media query for better mobile responsiveness */
+        @media (max-width: 576px) {
+            .assessment-links .link-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding-bottom: 16px;
+            }
+            
+            .assessment-links .link-title {
+                margin-bottom: 6px;
+                font-size: 1.1em;
+            }
+            
+            .assessment-links .link-url {
+                margin-bottom: 10px;
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .assessment-links .link-open-btn {
+                margin-left: 0;
+                align-self: flex-end;
+            }
+
+            .assessment-links .link-info {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1344,6 +1965,10 @@
                 </div>
             </div>
             <div class="user-actions">
+                <button id="notificationBtn" class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" style="display: none;">0</span>
+                </button>
                 <button class="btn btn-outline" onclick="handleLogout()">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
@@ -1416,6 +2041,124 @@
         </div>
     </div>
     
-    <script src="student-dashboard.js?v=1.2"></script>
+    <!-- Notifications Popup -->
+    <div id="notificationsPopup" class="notifications-popup">
+        <div class="notifications-header">
+            <h3>Notifications</h3>
+            <span class="mark-all-read" onclick="markAllNotificationsAsRead()">Mark all as read</span>
+        </div>
+        <div class="notifications-list">
+            <div class="empty-notifications">
+                <i class="fas fa-bell-slash" style="font-size: 3rem; color: var(--dark-gray); display: block; margin-bottom: 1rem;"></i>
+                <p>No new notifications</p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">You're all caught up!</p>
+            </div>
+        </div>
+        <div class="notifications-footer">
+            <a href="#" class="view-all-link">View All Notifications</a>
+        </div>
+    </div>
+    
+    <!-- Chat Windows -->
+    <div id="classChatWindow" class="chat-popup">
+        <div class="chat-header">
+            <h3><i class="fas fa-comments"></i> <span id="classChatTitle"></span></h3>
+            <button class="close-chat" onclick="closeClassChat()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-messages" id="classChatMessages">
+            <!-- Messages will be loaded dynamically -->
+            <div class="message received">
+                <div class="message-content">Welcome to the class chat!</div>
+                <div class="message-info">System, just now</div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="classChatInput" placeholder="Type your message here..." onkeypress="if(event.key === 'Enter') sendClassMessage()">
+            <button class="send-message-btn" onclick="sendClassMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    
+    <div id="teacherChatWindow" class="chat-popup">
+        <div class="chat-header">
+            <h3><i class="fas fa-user-tie"></i> <span id="teacherChatTitle"></span></h3>
+            <button class="close-chat" onclick="closeTeacherChat()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-messages" id="teacherChatMessages">
+            <!-- Messages will be loaded dynamically -->
+            <div class="message received">
+                <div class="message-content">Hello! How can I help you today?</div>
+                <div class="message-info">Teacher, just now</div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="teacherChatInput" placeholder="Type your message here..." onkeypress="if(event.key === 'Enter') sendTeacherMessage()">
+            <button class="send-message-btn" onclick="sendTeacherMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    
+    <div id="chatOverlay" class="overlay" onclick="closeAllChats()"></div>
+    
+    <!-- Announcements Popup -->
+    <div id="announcementsWindow" class="announcements-popup">
+        <div class="announcements-header">
+            <h3><i class="fas fa-bullhorn"></i> <span id="announcementsTitle">Class Announcements</span></h3>
+            <button class="close-announcements" onclick="closeAnnouncementsWindow()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="announcements-content" id="announcementsContent">
+            <!-- Announcements will be loaded dynamically -->
+            <div class="announcements-loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading announcements...
+            </div>
+        </div>
+    </div>
+    
+    <script src="student-dashboard.js?v=1.3"></script>
+    <script>
+        // Notifications functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBtn = document.getElementById('notificationBtn');
+            const notificationsPopup = document.getElementById('notificationsPopup');
+            
+            // Toggle notifications popup
+            notificationBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationsPopup.classList.toggle('active');
+                
+                // Load notifications when popup is opened
+                if (notificationsPopup.classList.contains('active')) {
+                    loadNotifications();
+                }
+            });
+            
+            // Close popup when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationsPopup.contains(e.target) && e.target !== notificationBtn) {
+                    notificationsPopup.classList.remove('active');
+                }
+            });
+            
+            // Load notifications count on page load
+            fetch('get_student_notifications.php?unread_only=true&limit=1')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateNotificationBadge(data.unread_count);
+                    }
+                })
+                .catch(error => console.error('Error loading notification count:', error));
+        });
+        
+        // Mark all notifications as read
+        function markAllNotificationsAsRead() {
+            const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+            unreadNotifications.forEach(notification => {
+                notification.classList.remove('unread');
+            });
+            
+            // Update notification badge
+            const badge = document.querySelector('.notification-badge');
+            badge.style.display = 'none';
+        }
+    </script>
 </body>
 </html> 

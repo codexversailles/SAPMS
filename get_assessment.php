@@ -47,6 +47,14 @@ try {
     $file_stmt->execute([$assessment_id]);
     $assessment['files'] = $file_stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Get associated links
+    $link_query = "SELECT id, link_title, link_url, created_at
+                  FROM assessment_links
+                  WHERE assessment_id = ?";
+    $link_stmt = $pdo->prepare($link_query);
+    $link_stmt->execute([$assessment_id]);
+    $assessment['links'] = $link_stmt->fetchAll(PDO::FETCH_ASSOC);
+    
     // Get student submissions
     $submissions_query = "SELECT ss.*, s.full_name as student_name, s.email as student_email
                         FROM student_submissions ss
@@ -57,19 +65,32 @@ try {
     $submissions_stmt->execute([$assessment_id]);
     $assessment['submissions'] = $submissions_stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Calculate submission stats
+    $assessment['total_submissions'] = count($assessment['submissions']);
+    $assessment['graded_submissions'] = 0;
+    $assessment['average_score'] = 0;
+    $total_score = 0;
+    
+    foreach ($assessment['submissions'] as $submission) {
+        if ($submission['score'] !== null) {
+            $assessment['graded_submissions']++;
+            $total_score += $submission['score'];
+        }
+    }
+    
+    if ($assessment['graded_submissions'] > 0) {
+        $assessment['average_score'] = round($total_score / $assessment['graded_submissions'], 1);
+    }
+    
     echo json_encode([
         'success' => true,
-        'data' => $assessment
+        'assessment' => $assessment
     ]);
 
 } catch (Exception $e) {
     echo json_encode([
         'success' => false,
-        'message' => 'Error retrieving assessment: ' . $e->getMessage(),
-        'debug' => [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]
+        'message' => 'Error retrieving assessment: ' . $e->getMessage()
     ]);
 }
 ?> 

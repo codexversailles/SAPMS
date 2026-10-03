@@ -1,0 +1,32 @@
+Script started
+Including db_connect.php
+DB connection included successfully
+Checking if table exists
+Table parent_teacher_messages exists
+Getting table structure
+Table columns:
+- id (int(11))
+- parent_id (int(11))
+- teacher_id (int(11))
+- class_id (int(11))
+- sender_type (enum('parent','teacher'))
+- message (text)
+- is_read (tinyint(1))
+- created_at (timestamp)
+Counting records
+Number of records: 10
+Getting sample record
+Sample record: 
+Array
+(
+    [id] => 1
+    [parent_id] => 5
+    [teacher_id] => 8
+    [class_id] => 1
+    [sender_type] => parent
+    [message] => Hello teacher, I wanted to ask about my child's progress in your class.
+    [is_read] => 0
+    [created_at] => 2025-05-14 23:17:22
+)
+
+Script finished

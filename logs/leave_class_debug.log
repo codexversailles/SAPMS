@@ -1,0 +1,46 @@
+[2025-05-22 12:14:48] Leave class process started
+[2025-05-22 12:14:48] Student ID: 32
+[2025-05-22 12:14:48] Raw input: {"class_id":2}
+[2025-05-22 12:14:48] Decoded data: Array
+(
+    [class_id] => 2
+)
+
+[2025-05-22 12:14:48] Processing leave request for student ID: 32, class ID: 2
+[2025-05-22 12:14:48] Checking if student is enrolled in class
+[22-May-2025 12:14:48 Europe/Berlin] PHP Warning:  Undefined variable $conn in C:\xampp\htdocs\StudyHub1\leave_class.php on line 78
+[22-May-2025 12:14:48 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\StudyHub1\leave_class.php:78
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\StudyHub1\leave_class.php on line 78
+[2025-05-22 12:15:13] Leave class process started
+[2025-05-22 12:15:13] Student ID: 32
+[2025-05-22 12:15:13] Raw input: {"class_id":2}
+[2025-05-22 12:15:13] Decoded data: Array
+(
+    [class_id] => 2
+)
+
+[2025-05-22 12:15:13] Processing leave request for student ID: 32, class ID: 2
+[2025-05-22 12:15:13] Checking if student is enrolled in class
+[22-May-2025 12:15:13 Europe/Berlin] PHP Warning:  Undefined variable $conn in C:\xampp\htdocs\StudyHub1\leave_class.php on line 78
+[22-May-2025 12:15:13 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in C:\xampp\htdocs\StudyHub1\leave_class.php:78
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\StudyHub1\leave_class.php on line 78
+[2025-05-22 12:21:59] Leave class process started
+[2025-05-22 12:21:59] Student ID: 32
+[2025-05-22 12:21:59] Raw input: {"class_id":2}
+[2025-05-22 12:21:59] Decoded data: Array
+(
+    [class_id] => 2
+)
+
+[2025-05-22 12:21:59] Processing leave request for student ID: 32, class ID: 2
+[2025-05-22 12:21:59] Checking if student is enrolled in class
+[2025-05-22 12:21:59] Student is enrolled, proceeding with class removal
+[2025-05-22 12:21:59] Transaction started
+[2025-05-22 12:21:59] Deleted student submissions: 0 rows
+[2025-05-22 12:21:59] Removed student from class: 1 rows
+[2025-05-22 12:21:59] Transaction committed successfully
+[2025-05-22 12:21:59] Success response: {"success":true,"message":"You have successfully left the class"}

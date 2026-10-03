@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub Database Structure Map</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            overflow-x: auto;
+            min-width: 100%;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 5000px;
+            height: 3000px;
+            position: relative;
+        }
+        
+        .table {
+            position: absolute;
+            background-color: #fff;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            min-width: 200px;
+        }
+        
+        .table-title {
+            background-color: #3498db;
+            color: white;
+            padding: 8px;
+            margin: -10px -10px 10px -10px;
+            border-radius: 3px 3px 0 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .field {
+            padding: 3px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        
+        .primary-key {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .foreign-key {
+            color: #9b59b6;
+            font-weight: bold;
+        }
+        
+        .field-type {
+            color: #7f8c8d;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        .connector {
+            position: absolute;
+            background-color: rgba(52, 152, 219, 0.5);
+            z-index: 5;
+            transform-origin: left center;
+        }
+        
+        .connector::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-top: 6px solid transparent;
+            border-left: 10px solid rgba(52, 152, 219, 0.8);
+            border-bottom: 6px solid transparent;
+        }
+        
+        .legend {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #3498db;
+            z-index: 100;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            margin: 5px 0;
+        }
+        
+        .legend-color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        
+        .title {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #3498db;
+            z-index: 100;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        #zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        
+        .relationship-label {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            z-index: 15;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">StudyHub Database Structure Map</div>
+    
+    <div class="legend">
+        <div class="legend-item"><span class="legend-color" style="background-color: #e74c3c;"></span> Primary Key</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: #9b59b6;"></span> Foreign Key</div>
+        <div class="legend-item"><span class="legend-color" style="background-color: rgba(52, 152, 219, 0.5);"></span> Relationship</div>
+    </div>
+    
+    <div id="zoom-controls">
+        <button id="zoom-in">Zoom In</button>
+        <button id="zoom-out">Zoom Out</button>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <div class="container" id="db-container">
+        <!-- Students Table -->
+        <div class="table" style="left: 300px; top: 200px;">
+            <div class="table-title">students</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field">full_name <span class="field-type">varchar(100)</span></div>
+            <div class="field">email <span class="field-type">varchar(100)</span></div>
+            <div class="field">password <span class="field-type">varchar(255)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+            <div class="field">last_login <span class="field-type">timestamp</span></div>
+            <div class="field">is_active <span class="field-type">tinyint(1)</span></div>
+            <div class="field">reset_token <span class="field-type">varchar(255)</span></div>
+            <div class="field">reset_token_expiry <span class="field-type">timestamp</span></div>
+            <div class="field">student_id <span class="field-type">varchar(20)</span></div>
+        </div>
+        
+        <!-- Teachers Table -->
+        <div class="table" style="left: 1800px; top: 200px;">
+            <div class="table-title">teachers</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field">full_name <span class="field-type">varchar(100)</span></div>
+            <div class="field">email <span class="field-type">varchar(100)</span></div>
+            <div class="field">password <span class="field-type">varchar(255)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+            <div class="field">updated_at <span class="field-type">timestamp</span></div>
+            <div class="field">teacher_id <span class="field-type">varchar(20)</span></div>
+        </div>
+        
+        <!-- Classes Table -->
+        <div class="table" style="left: 1050px; top: 500px;">
+            <div class="table-title">classes</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field">class_name <span class="field-type">varchar(100)</span></div>
+            <div class="field">class_code <span class="field-type">varchar(10)</span></div>
+            <div class="field foreign-key">teacher_id <span class="field-type">int(11)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+            <div class="field">updated_at <span class="field-type">timestamp</span></div>
+            <div class="field">is_active <span class="field-type">tinyint(1)</span></div>
+        </div>
+        
+        <!-- Class Students Table -->
+        <div class="table" style="left: 650px; top: 500px;">
+            <div class="table-title">class_students</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">class_id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">student_id <span class="field-type">int(11)</span></div>
+            <div class="field">enrolled_at <span class="field-type">timestamp</span></div>
+            <div class="field">status <span class="field-type">enum('active','inactive')</span></div>
+        </div>
+        
+        <!-- Assessments Table -->
+        <div class="table" style="left: 1450px; top: 500px;">
+            <div class="table-title">assessments</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">class_id <span class="field-type">int(11)</span></div>
+            <div class="field">title <span class="field-type">varchar(255)</span></div>
+            <div class="field">description <span class="field-type">text</span></div>
+            <div class="field">due_date <span class="field-type">datetime</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+            <div class="field">updated_at <span class="field-type">timestamp</span></div>
+            <div class="field">max_score <span class="field-type">int(11)</span></div>
+        </div>
+        
+        <!-- Lessons Table -->
+        <div class="table" style="left: 1050px; top: 800px;">
+            <div class="table-title">lessons</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">class_id <span class="field-type">int(11)</span></div>
+            <div class="field">title <span class="field-type">varchar(255)</span></div>
+            <div class="field">description <span class="field-type">text</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+            <div class="field">updated_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Assessment Files Table -->
+        <div class="table" style="left: 1750px; top: 500px;">
+            <div class="table-title">assessment_files</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">assessment_id <span class="field-type">int(11)</span></div>
+            <div class="field">file_name <span class="field-type">varchar(255)</span></div>
+            <div class="field">file_path <span class="field-type">varchar(255)</span></div>
+            <div class="field">file_type <span class="field-type">varchar(50)</span></div>
+            <div class="field">file_size <span class="field-type">int(11)</span></div>
+            <div class="field">uploaded_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Lesson Files Table -->
+        <div class="table" style="left: 1350px; top: 800px;">
+            <div class="table-title">lesson_files</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">lesson_id <span class="field-type">int(11)</span></div>
+            <div class="field">file_name <span class="field-type">varchar(255)</span></div>
+            <div class="field">file_path <span class="field-type">varchar(255)</span></div>
+            <div class="field">file_type <span class="field-type">varchar(50)</span></div>
+            <div class="field">file_size <span class="field-type">int(11)</span></div>
+            <div class="field">uploaded_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Student Submissions Table -->
+        <div class="table" style="left: 1450px; top: 300px;">
+            <div class="table-title">student_submissions</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">assessment_id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">student_id <span class="field-type">int(11)</span></div>
+            <div class="field">submission_date <span class="field-type">timestamp</span></div>
+            <div class="field">submission_text <span class="field-type">text</span></div>
+            <div class="field">score <span class="field-type">float</span></div>
+            <div class="field">teacher_feedback <span class="field-type">text</span></div>
+        </div>
+        
+        <!-- Submission Files Table -->
+        <div class="table" style="left: 1750px; top: 300px;">
+            <div class="table-title">submission_files</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">submission_id <span class="field-type">int(11)</span></div>
+            <div class="field">file_name <span class="field-type">varchar(255)</span></div>
+            <div class="field">file_path <span class="field-type">varchar(255)</span></div>
+            <div class="field">file_type <span class="field-type">varchar(50)</span></div>
+            <div class="field">file_size <span class="field-type">int(11)</span></div>
+            <div class="field">uploaded_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Notifications Table -->
+        <div class="table" style="left: 300px; top: 500px;">
+            <div class="table-title">notifications</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">student_id <span class="field-type">int(11)</span></div>
+            <div class="field">type <span class="field-type">enum('lesson','assessment','message','class_message','system')</span></div>
+            <div class="field">title <span class="field-type">varchar(255)</span></div>
+            <div class="field">message <span class="field-type">text</span></div>
+            <div class="field">reference_id <span class="field-type">int(11)</span></div>
+            <div class="field">class_id <span class="field-type">int(11)</span></div>
+            <div class="field">is_read <span class="field-type">tinyint(1)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Class Chat Messages Table -->
+        <div class="table" style="left: 750px; top: 800px;">
+            <div class="table-title">class_chat_messages</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">class_id <span class="field-type">int(11)</span></div>
+            <div class="field">sender_id <span class="field-type">int(11)</span></div>
+            <div class="field">sender_type <span class="field-type">enum('student','teacher')</span></div>
+            <div class="field">message <span class="field-type">text</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Teacher Student Messages Table -->
+        <div class="table" style="left: 350px; top: 800px;">
+            <div class="table-title">teacher_student_messages</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">teacher_id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">student_id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">class_id <span class="field-type">int(11)</span></div>
+            <div class="field">sender_type <span class="field-type">enum('student','teacher')</span></div>
+            <div class="field">message <span class="field-type">text</span></div>
+            <div class="field">is_read <span class="field-type">tinyint(1)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Parents Table -->
+        <div class="table" style="left: 300px; top: 1100px;">
+            <div class="table-title">parents</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field">parent_full_name <span class="field-type">varchar(100)</span></div>
+            <div class="field">email <span class="field-type">varchar(100)</span></div>
+            <div class="field">password <span class="field-type">varchar(255)</span></div>
+            <div class="field">phone_number <span class="field-type">varchar(20)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+            <div class="field">last_login <span class="field-type">timestamp</span></div>
+            <div class="field">is_active <span class="field-type">tinyint(1)</span></div>
+            <div class="field">reset_token <span class="field-type">varchar(255)</span></div>
+            <div class="field">reset_token_expiry <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Parent Children Table -->
+        <div class="table" style="left: 600px; top: 1100px;">
+            <div class="table-title">parent_children</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">parent_id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">student_id <span class="field-type">varchar(20)</span></div>
+            <div class="field">relationship <span class="field-type">varchar(50)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Parent Teacher Messages Table -->
+        <div class="table" style="left: 900px; top: 1100px;">
+            <div class="table-title">parent_teacher_messages</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">parent_id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">teacher_id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">class_id <span class="field-type">int(11)</span></div>
+            <div class="field">sender_type <span class="field-type">enum('parent','teacher')</span></div>
+            <div class="field">message <span class="field-type">text</span></div>
+            <div class="field">is_read <span class="field-type">tinyint(1)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Login Attempts Table -->
+        <div class="table" style="left: 1800px; top: 1100px;">
+            <div class="table-title">login_attempts</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field">email <span class="field-type">varchar(100)</span></div>
+            <div class="field">attempt_time <span class="field-type">timestamp</span></div>
+            <div class="field">ip_address <span class="field-type">varchar(45)</span></div>
+        </div>
+        
+        <!-- Sessions Table -->
+        <div class="table" style="left: 1800px; top: 1300px;">
+            <div class="table-title">sessions</div>
+            <div class="field primary-key">id <span class="field-type">int(11)</span></div>
+            <div class="field foreign-key">student_id <span class="field-type">int(11)</span></div>
+            <div class="field">session_token <span class="field-type">varchar(255)</span></div>
+            <div class="field">created_at <span class="field-type">timestamp</span></div>
+            <div class="field">expires_at <span class="field-type">timestamp</span></div>
+        </div>
+        
+        <!-- Student ID Sequence Table -->
+        <div class="table" style="left: 300px; top: 1500px;">
+            <div class="table-title">student_id_sequence</div>
+            <div class="field primary-key">year <span class="field-type">int(11)</span></div>
+            <div class="field">next_value <span class="field-type">int(11)</span></div>
+        </div>
+        
+        <!-- Teacher ID Sequence Table -->
+        <div class="table" style="left: 1800px; top: 1500px;">
+            <div class="table-title">teacher_id_sequence</div>
+            <div class="field primary-key">year <span class="field-type">int(11)</span></div>
+            <div class="field">next_value <span class="field-type">int(11)</span></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('db-container');
+            
+            // Relationships data
+            const relationships = [
+                // Teachers to Classes
+                { from: { table: 'teachers', field: 'id' }, to: { table: 'classes', field: 'teacher_id' } },
+                
+                // Classes to other tables
+                { from: { table: 'classes', field: 'id' }, to: { table: 'class_students', field: 'class_id' } },
+                { from: { table: 'classes', field: 'id' }, to: { table: 'assessments', field: 'class_id' } },
+                { from: { table: 'classes', field: 'id' }, to: { table: 'lessons', field: 'class_id' } },
+                { from: { table: 'classes', field: 'id' }, to: { table: 'class_chat_messages', field: 'class_id' } },
+                { from: { table: 'classes', field: 'id' }, to: { table: 'teacher_student_messages', field: 'class_id' } },
+                { from: { table: 'classes', field: 'id' }, to: { table: 'parent_teacher_messages', field: 'class_id' } },
+                
+                // Students to other tables
+                { from: { table: 'students', field: 'id' }, to: { table: 'class_students', field: 'student_id' } },
+                { from: { table: 'students', field: 'id' }, to: { table: 'student_submissions', field: 'student_id' } },
+                { from: { table: 'students', field: 'id' }, to: { table: 'notifications', field: 'student_id' } },
+                { from: { table: 'students', field: 'id' }, to: { table: 'teacher_student_messages', field: 'student_id' } },
+                { from: { table: 'students', field: 'id' }, to: { table: 'sessions', field: 'student_id' } },
+                { from: { table: 'students', field: 'student_id' }, to: { table: 'parent_children', field: 'student_id' } },
+                
+                // Assessments to other tables
+                { from: { table: 'assessments', field: 'id' }, to: { table: 'assessment_files', field: 'assessment_id' } },
+                { from: { table: 'assessments', field: 'id' }, to: { table: 'student_submissions', field: 'assessment_id' } },
+                
+                // Lessons to Lesson Files
+                { from: { table: 'lessons', field: 'id' }, to: { table: 'lesson_files', field: 'lesson_id' } },
+                
+                // Student Submissions to Submission Files
+                { from: { table: 'student_submissions', field: 'id' }, to: { table: 'submission_files', field: 'submission_id' } },
+                
+                // Parents to Parent Children
+                { from: { table: 'parents', field: 'id' }, to: { table: 'parent_children', field: 'parent_id' } },
+                { from: { table: 'parents', field: 'id' }, to: { table: 'parent_teacher_messages', field: 'parent_id' } },
+                
+                // Teachers to Teacher-related messages
+                { from: { table: 'teachers', field: 'id' }, to: { table: 'teacher_student_messages', field: 'teacher_id' } },
+                { from: { table: 'teachers', field: 'id' }, to: { table: 'parent_teacher_messages', field: 'teacher_id' } }
+            ];
+            
+            // Draw connections
+            relationships.forEach(rel => {
+                drawConnection(rel.from, rel.to);
+            });
+            
+            function drawConnection(from, to) {
+                const fromTable = document.querySelector(`.table-title:contains('${from.table}')`).parentNode;
+                const toTable = document.querySelector(`.table-title:contains('${to.table}')`).parentNode;
+                
+                if (!fromTable || !toTable) return;
+                
+                const fromField = fromTable.querySelector(`.field:contains('${from.field}')`);
+                const toField = toTable.querySelector(`.field:contains('${to.field}')`);
+                
+                if (!fromField || !toField) return;
+                
+                const fromRect = fromField.getBoundingClientRect();
+                const toRect = toField.getBoundingClientRect();
+                const fromTableRect = fromTable.getBoundingClientRect();
+                const toTableRect = toTable.getBoundingClientRect();
+                
+                // Calculate positions relative to the container
+                const fromX = fromTable.offsetLeft + fromField.offsetLeft + fromField.offsetWidth;
+                const fromY = fromTable.offsetTop + fromField.offsetTop + fromField.offsetHeight / 2;
+                const toX = toTable.offsetLeft + toField.offsetLeft;
+                const toY = toTable.offsetTop + toField.offsetTop + toField.offsetHeight / 2;
+                
+                // Calculate distance and angle
+                const dx = toX - fromX;
+                const dy = toY - fromY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                // Create connector
+                const connector = document.createElement('div');
+                connector.className = 'connector';
+                connector.style.left = `${fromX}px`;
+                connector.style.top = `${fromY}px`;
+                connector.style.width = `${distance}px`;
+                connector.style.height = '2px';
+                connector.style.transform = `rotate(${angle}deg)`;
+                
+                // Add a label for the relationship
+                const labelX = fromX + (dx / 2);
+                const labelY = fromY + (dy / 2) - 10;
+                const label = document.createElement('div');
+                label.className = 'relationship-label';
+                label.textContent = `${from.table}.${from.field} → ${to.table}.${to.field}`;
+                label.style.left = `${labelX}px`;
+                label.style.top = `${labelY}px`;
+                
+                container.appendChild(connector);
+                container.appendChild(label);
+            }
+            
+            // Helper for jQuery-like contains selector
+            Document.prototype.querySelector = Document.prototype.querySelector || function(selector) {
+                if (selector.includes(':contains(')) {
+                    const match = selector.match(/:contains\('([^']+)'\)/);
+                    if (match) {
+                        const text = match[1];
+                        const elements = document.querySelectorAll(selector.split(':contains')[0]);
+                        for (let i = 0; i < elements.length; i++) {
+                            if (elements[i].textContent.includes(text)) {
+                                return elements[i];
+                            }
+                        }
+                        return null;
+                    }
+                }
+                return document.querySelector(selector);
+            };
+            
+            // Zoom functionality
+            let scale = 1;
+            const zoomInBtn = document.getElementById('zoom-in');
+            const zoomOutBtn = document.getElementById('zoom-out');
+            const resetBtn = document.getElementById('reset');
+            
+            zoomInBtn.addEventListener('click', () => {
+                scale += 0.1;
+                container.style.transform = `scale(${scale})`;
+            });
+            
+            zoomOutBtn.addEventListener('click', () => {
+                if (scale > 0.2) {
+                    scale -= 0.1;
+                    container.style.transform = `scale(${scale})`;
+                }
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                scale = 1;
+                container.style.transform = `scale(${scale})`;
+            });
+        });
+    </script>
+</body>
+</html> 
