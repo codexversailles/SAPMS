@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub - Learning Together, Growing Smarter</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SAP-MS</div>
+        <ul class="nav-links">
+            <li><a href="#students">Students</a></li>
+            <li><a href="#teachers">Teachers</a></li>
+        </ul>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Learning Together, Growing Smarter</h1>
+            <p>A platform where students learn, teachers teach, and parents stay involved.</p>
+            <button class="cta-button" onclick="openModal()">Get Started</button>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <h2>About StudyHub</h2>
+        <div class="cards-container">
+            <div class="card">
+                <i class="fas fa-user-graduate"></i>
+                <h3>Students</h3>
+                <p>Access personalized learning materials, track progress, and collaborate with peers in an engaging digital environment.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h3>Teachers</h3>
+                <p>Create interactive lessons, manage assignments, and monitor student progress with powerful teaching tools.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-users"></i>
+                <h3>Parents</h3>
+                <p>Stay informed about your child's academic journey with real-time updates and direct communication with teachers.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Role Selection Modal -->
+    <div id="roleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Choose Your Role</h2>
+            <p>Select how you'll be using StudyHub</p>
+            <div class="role-options">
+                <div class="role-option" onclick="selectRole('student')">
+                    <i class="fas fa-user-graduate"></i>
+                    <h3>Student</h3>
+                    <p>Access learning materials and track your progress</p>
+                </div>
+                <div class="role-option" onclick="selectRole('teacher')">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h3>Teacher</h3>
+                    <p>Create lessons and manage your classroom</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('roleModal').style.display = 'block';
+        }
+
+        function selectRole(role) {
+            if (role === 'student') {
+                window.location.href = 'student-auth.html';
+            } else if (role === 'teacher') {
+                window.location.href = 'teacher-auth.html';
+            } else {
+                // For now, just close the modal for other roles
+                document.getElementById('roleModal').style.display = 'none';
+            }
+        }
+
+        // Close modal when clicking the close button or outside the modal
+        document.querySelector('.close-modal').onclick = function() {
+            document.getElementById('roleModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('roleModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html> 

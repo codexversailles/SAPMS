@@ -1,0 +1,57 @@
+Request received at: 2025-05-12 14:58:38
+Raw request data: {"class_name":"hi","class_code":"F532I8"}
+Decoded data: Array
+(
+    [class_name] => hi
+    [class_code] => F532I8
+)
+
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [student_id] => 32
+    [parent_id] => 5
+    [parent_name] => 
+)
+
+Processing with: class_name=hi, class_code=F532I8, teacher_id=8
+Class created successfully with ID: 7
+Request received at: 2025-05-12 14:58:57
+Raw request data: {"class_name":"Type Shi","class_code":"J9IP8D"}
+Decoded data: Array
+(
+    [class_name] => Type Shi
+    [class_code] => J9IP8D
+)
+
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [student_id] => 32
+    [parent_id] => 5
+    [parent_name] => 
+)
+
+Processing with: class_name=Type Shi, class_code=J9IP8D, teacher_id=8
+Class created successfully with ID: 8
+Request received at: 2025-05-12 15:05:06
+Raw request data: {"class_name":"Sup Nigga","class_code":"FP2XW4"}
+Decoded data: Array
+(
+    [class_name] => Sup Nigga
+    [class_code] => FP2XW4
+)
+
+Session data: Array
+(
+    [teacher_id] => 8
+    [teacher_name] => lance
+    [student_id] => 32
+    [parent_id] => 5
+    [parent_name] => 
+)
+
+Processing with: class_name=Sup Nigga, class_code=FP2XW4, teacher_id=8
+Class created successfully with ID: 9
